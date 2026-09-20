@@ -16,7 +16,7 @@ const trustPoints = [
 const stats = [
   { number: `${displayServices.length}+`, label: "خدمة متخصصة تحت سقف واحد" },
   { number: "24/7", label: "الحجز الأونلاين متاح في أي وقت" },
-  { number: "0", label: "جنيه رسوم على الحجز الأونلاين" },
+  { number: "100%", label: "التزام براحتك واهتمامك" },
   { number: "1", label: "دقيقة بس لتأكيد ميعادك" },
 ];
 
