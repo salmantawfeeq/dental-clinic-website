@@ -1,6 +1,9 @@
+"use client";
+
+import { useState } from "react";
 import Link from "next/link";
 import { clinicInfo } from "@/lib/clinicInfo";
-import { IconPhone, IconWhatsapp } from "./icons";
+import { IconPhone, IconWhatsapp, IconMenu, IconClose } from "./icons";
 
 const navItems = [
   { href: "/", label: "الرئيسية" },
@@ -10,6 +13,8 @@ const navItems = [
 ];
 
 export function SiteHeader() {
+  const [menuOpen, setMenuOpen] = useState(false);
+
   return (
     <header
       style={{
@@ -18,7 +23,7 @@ export function SiteHeader() {
         top: 0,
         background: "rgba(255,255,255,0.85)",
         backdropFilter: "blur(10px)",
-        zIndex: 20,
+        zIndex: 30,
       }}
     >
       <div className="container" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", height: 78, gap: 16 }}>
@@ -57,11 +62,38 @@ export function SiteHeader() {
           <a href={clinicInfo.phoneHref} className="header-icon-link" style={{ color: "var(--color-ink-soft)", display: "flex", alignItems: "center" }} aria-label="اتصال">
             <IconPhone size={20} />
           </a>
-          <Link href="/book" className="btn btn-primary" style={{ padding: "12px 26px", fontSize: "0.95rem" }}>
+          <Link href="/book" className="btn btn-primary" style={{ padding: "12px 22px", fontSize: "0.92rem" }}>
             احجز موعدك
           </Link>
+          <button
+            type="button"
+            className="hamburger-btn"
+            onClick={() => setMenuOpen((v) => !v)}
+            aria-label={menuOpen ? "إغلاق القائمة" : "فتح القائمة"}
+            aria-expanded={menuOpen}
+          >
+            {menuOpen ? <IconClose size={22} /> : <IconMenu size={22} />}
+          </button>
         </div>
       </div>
+
+      {menuOpen && (
+        <div className="mobile-menu">
+          {navItems.map((item) => (
+            <Link key={item.href} href={item.href} onClick={() => setMenuOpen(false)}>
+              {item.label}
+            </Link>
+          ))}
+          <div className="mobile-menu-contact">
+            <a href={clinicInfo.phoneHref} style={{ display: "flex", alignItems: "center", gap: 8 }}>
+              <IconPhone size={18} /> اتصال
+            </a>
+            <a href={clinicInfo.whatsappHref} target="_blank" rel="noopener noreferrer" style={{ display: "flex", alignItems: "center", gap: 8, color: "#25D366" }}>
+              <IconWhatsapp size={18} /> واتساب
+            </a>
+          </div>
+        </div>
+      )}
     </header>
   );
 }

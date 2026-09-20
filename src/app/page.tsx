@@ -4,7 +4,7 @@ import { SiteFooter } from "@/components/SiteFooter";
 import { clinicInfo } from "@/lib/clinicInfo";
 import { displayServices } from "@/lib/services";
 import { asset } from "@/lib/basePath";
-import { IconTooth, IconShield, IconCalendarCheck, IconWallet, IconSparkle } from "@/components/icons";
+import { IconTooth, IconShield, IconCalendarCheck, IconWallet, IconSparkle, IconClock, IconGraduationCap } from "@/components/icons";
 
 const trustPoints = [
   { icon: <IconCalendarCheck />, title: "حجز فوري بدون انتظار", desc: "موعدك بيتأكد لحظة الحجز مباشرة، من غير ما تنتظر رد من حد." },
@@ -18,6 +18,13 @@ const stats = [
   { number: "24/7", label: "الحجز الأونلاين متاح في أي وقت" },
   { number: "0", label: "جنيه رسوم على الحجز الأونلاين" },
   { number: "1", label: "دقيقة بس لتأكيد ميعادك" },
+];
+
+const clinicFeatures = [
+  { icon: <IconGraduationCap />, title: "أحدث الأجهزة والتقنيات", desc: "تشخيص وعلاج دقيق باستخدام معدات حديثة في كل خطوة." },
+  { icon: <IconShield />, title: "بيئة نظيفة ومريحة", desc: "تعقيم كامل وإجراءات سلامة صارمة قبل وبعد كل مريض." },
+  { icon: <IconClock />, title: "مواعيد مسائية يوميًا", desc: clinicInfo.hours + "." },
+  { icon: <IconTooth />, title: "خدمات شاملة لكل العائلة", desc: "من الكشف الدوري وتنظيف الأسنان لحد الزراعة وجراحات الفكين." },
 ];
 
 const steps = [
@@ -93,8 +100,8 @@ export default function HomePage() {
               }}
             >
               <img
-                src={asset("doctor-photo.jpg")}
-                alt={clinicInfo.doctorName}
+                src={asset("hero-clinic.jpg")}
+                alt="غرفة علاج مجهزة في عيادة أسنان"
                 style={{ width: "100%", height: "100%", objectFit: "cover" }}
               />
             </div>
@@ -110,6 +117,30 @@ export default function HomePage() {
               <div key={s.label} className="stat">
                 <span className="stat-number">{s.number}</span>
                 <span className="stat-label">{s.label}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* About the clinic */}
+      <section className="section" style={{ paddingTop: 0, background: "var(--color-bg-soft)" }}>
+        <div className="container">
+          <div className="section-head">
+            <span className="eyebrow">عن العيادة</span>
+            <h2 className="section-title">رعاية أسنان متكاملة في مكان واحد</h2>
+            <p className="section-subtitle" style={{ maxWidth: 640, margin: "0 auto" }}>
+              {clinicInfo.name} بتقدم رعاية شاملة لطب الفم والأسنان لكل أفراد العائلة، من الكشف الدوري
+              وتنظيف الأسنان لحد زراعة الأسنان وجراحات الوجه والفكين — في بيئة مريحة ومجهزة بأحدث
+              الإمكانيات، ومواعيد مسائية تناسب انشغالك.
+            </p>
+          </div>
+          <div className="grid-auto">
+            {clinicFeatures.map((f) => (
+              <div key={f.title} className="card interactive" style={{ padding: 24, height: "100%" }}>
+                <div className="icon-badge">{f.icon}</div>
+                <h3 style={{ margin: "16px 0 6px", fontSize: "1.02rem" }}>{f.title}</h3>
+                <p style={{ margin: 0, color: "var(--color-ink-soft)", fontSize: "0.92rem" }}>{f.desc}</p>
               </div>
             ))}
           </div>
