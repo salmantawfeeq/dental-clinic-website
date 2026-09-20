@@ -4,7 +4,8 @@ import { SiteFooter } from "@/components/SiteFooter";
 import { clinicInfo } from "@/lib/clinicInfo";
 import { displayServices } from "@/lib/services";
 import { asset } from "@/lib/basePath";
-import { IconTooth, IconShield, IconCalendarCheck, IconWallet, IconSparkle, IconClock, IconGraduationCap } from "@/components/icons";
+import { IconTooth, IconShield, IconCalendarCheck, IconWallet, IconSparkle, IconClock, IconGraduationCap, IconQuote } from "@/components/icons";
+import { testimonials } from "@/lib/testimonials";
 
 const trustPoints = [
   { icon: <IconCalendarCheck />, title: "حجز فوري بدون انتظار", desc: "موعدك بيتأكد لحظة الحجز مباشرة، من غير ما تنتظر رد من حد." },
@@ -255,6 +256,28 @@ export default function HomePage() {
             <Link href="/about" className="btn btn-outline" style={{ marginTop: 16 }}>
               اعرف أكتر
             </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Testimonials */}
+      <section className="section" style={{ background: "var(--color-bg-soft)" }}>
+        <div className="container">
+          <div className="section-head">
+            <span className="eyebrow">آراء مرضانا</span>
+            <h2 className="section-title">كلام حقيقي من مرضى حقيقيين</h2>
+            <p className="section-subtitle">آراء من فيسبوك وواتساب — بدون أسماء بناءً على طلب العيادة.</p>
+          </div>
+          <div className="grid-auto">
+            {testimonials.map((t, i) => (
+              <div key={i} className="feature-item" style={{ flexDirection: "column", gap: 10 }}>
+                <span style={{ color: "var(--color-primary)" }}>
+                  <IconQuote size={28} />
+                </span>
+                <p style={{ margin: 0, fontSize: "1rem", lineHeight: 1.8, color: "var(--color-ink)" }}>{t.quote}</p>
+                <span style={{ fontSize: "0.82rem", color: "var(--color-ink-faint)" }}>{t.source}</span>
+              </div>
+            ))}
           </div>
         </div>
       </section>
