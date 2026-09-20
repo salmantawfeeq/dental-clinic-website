@@ -6,8 +6,8 @@ import { asset } from "@/lib/basePath";
 import { IconGraduationCap, IconShield, IconSparkle } from "@/components/icons";
 
 const highlights = [
-  { icon: <IconGraduationCap />, title: "التخصص", desc: clinicInfo.doctorTitle },
-  { icon: <IconSparkle />, title: "المؤهل العلمي", desc: clinicInfo.doctorQualification },
+  { icon: <IconGraduationCap />, title: "المؤهل العلمي", desc: clinicInfo.doctorQualification },
+  { icon: <IconSparkle />, title: "دقة في التشخيص والتنفيذ", desc: "اهتمام بأدق التفاصيل، خصوصًا في الحالات الجراحية الدقيقة." },
   { icon: <IconShield />, title: "رعاية موثوقة", desc: "متابعة كاملة لحالتك من الكشف لحد ما تخلص علاج." },
 ];
 
