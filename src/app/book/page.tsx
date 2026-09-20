@@ -26,9 +26,12 @@ export default async function BookPage() {
   return (
     <>
       <SiteHeader />
-      <div className="container" style={{ padding: "48px 0 80px", maxWidth: 640 }}>
-        <h1 style={{ fontSize: "1.6rem", marginBottom: 8 }}>احجز موعدك</h1>
-        <p style={{ color: "var(--color-ink-soft)", marginTop: 0, marginBottom: 32 }}>
+      <div className="container" style={{ padding: "56px 0 96px", maxWidth: 640 }}>
+        <span className="eyebrow">احجز موعدك</span>
+        <h1 style={{ fontSize: "clamp(1.5rem, 3vw, 2rem)", fontWeight: 800, margin: "14px 0 8px" }}>
+          خلّي موعدك جاهز في أقل من دقيقة
+        </h1>
+        <p style={{ color: "var(--color-ink-soft)", marginTop: 0, marginBottom: 36, fontSize: "1.02rem" }}>
           الحجز مجاني وبيتأكد فورًا — من غير ما تحتاج تدفع أو تستنى موافقة.
         </p>
         <BookingWizard services={services} />
