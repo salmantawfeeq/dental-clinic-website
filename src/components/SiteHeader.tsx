@@ -1,6 +1,13 @@
 import Link from "next/link";
 import { clinicInfo } from "@/lib/clinicInfo";
-import { IconPhone } from "./icons";
+import { IconPhone, IconWhatsapp } from "./icons";
+
+const navItems = [
+  { href: "/", label: "الرئيسية" },
+  { href: "/about", label: "عن الدكتور" },
+  { href: "/services", label: "الخدمات" },
+  { href: "/contact", label: "تواصل معنا" },
+];
 
 export function SiteHeader() {
   return (
@@ -32,29 +39,29 @@ export function SiteHeader() {
           >
             🦷
           </span>
+          <span className="header-logo-name">{clinicInfo.name}</span>
         </Link>
 
-        <nav style={{ display: "flex", alignItems: "center", gap: 14 }}>
-          {clinicInfo.phone && (
-            <a
-              href={`tel:${clinicInfo.phone}`}
-              style={{
-                color: "var(--color-ink-soft)",
-                fontSize: "0.95rem",
-                display: "flex",
-                alignItems: "center",
-                gap: 6,
-                fontWeight: 600,
-              }}
-            >
-              <IconPhone size={18} />
-              <span dir="ltr">{clinicInfo.phone}</span>
-            </a>
-          )}
+        <nav className="nav-links">
+          {navItems.map((item) => (
+            <Link key={item.href} href={item.href}>
+              {item.label}
+            </Link>
+          ))}
+        </nav>
+
+        <div className="header-contact">
+          <a href={clinicInfo.whatsappHref} target="_blank" rel="noopener noreferrer" className="header-icon-link" style={{ color: "#25D366", display: "flex", alignItems: "center", gap: 6 }} aria-label="واتساب">
+            <IconWhatsapp size={22} />
+          </a>
+          <a href={clinicInfo.phoneHref} className="header-icon-link" style={{ color: "var(--color-ink-soft)", display: "flex", alignItems: "center", gap: 6, fontWeight: 600 }}>
+            <IconPhone size={18} />
+            <span dir="ltr">{clinicInfo.phoneDisplay}</span>
+          </a>
           <Link href="/book" className="btn btn-primary" style={{ padding: "12px 26px", fontSize: "0.95rem" }}>
             احجز موعدك
           </Link>
-        </nav>
+        </div>
       </div>
     </header>
   );

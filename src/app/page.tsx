@@ -1,36 +1,19 @@
 import Link from "next/link";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
-import { getSupabasePublic } from "@/lib/supabasePublic";
 import { clinicInfo } from "@/lib/clinicInfo";
+import { displayServices } from "@/lib/services";
 import { asset } from "@/lib/basePath";
 import { IconTooth, IconClock, IconShield, IconCalendarCheck, IconWallet, IconSparkle } from "@/components/icons";
-
-async function getServices() {
-  try {
-    const supabase = getSupabasePublic();
-    const { data } = await supabase
-      .from("services")
-      .select("id, name, duration_min_minutes, duration_max_minutes")
-      .eq("is_active", true)
-      .order("display_order", { ascending: true });
-    return data ?? [];
-  } catch {
-    // Supabase لسه مش متظبط (بند Phase 6) — الصفحة تفضل تشتغل من غير قسم الخدمات لحد ما يتظبط.
-    return [];
-  }
-}
 
 const trustPoints = [
   { icon: <IconCalendarCheck />, title: "حجز فوري بدون انتظار", desc: "موعدك بيتأكد لحظة الحجز مباشرة، من غير ما تنتظر رد من حد." },
   { icon: <IconWallet />, title: "بدون أي رسوم", desc: "الحجز الأونلاين مجاني بالكامل — تدفع في العيادة وقت الكشف بس." },
   { icon: <IconShield />, title: "بياناتك محفوظة وآمنة", desc: "معلوماتك بتتحفظ في ملفك الطبي داخل العيادة، مش بتتشارك مع حد." },
-  { icon: <IconClock />, title: "مواعيد مسائية مريحة", desc: "العيادة فاتحة يوميًا من 4 العصر لحد 11 بالليل، تختار الوقت المناسب لك." },
+  { icon: <IconClock />, title: "مواعيد مسائية مريحة", desc: clinicInfo.hours + "، تختار الوقت المناسب لك." },
 ];
 
-export default async function HomePage() {
-  const services = await getServices();
-
+export default function HomePage() {
   return (
     <>
       <SiteHeader />
@@ -49,23 +32,21 @@ export default async function HomePage() {
         <div className="container hero-grid">
           <div>
             <span className="eyebrow">
-              <IconSparkle size={16} /> رعاية أسنان بمعايير عالمية
+              <IconSparkle size={16} /> {clinicInfo.doctorTitle}
             </span>
             <h1 style={{ fontSize: "clamp(2rem, 4.2vw, 3.1rem)", fontWeight: 800, lineHeight: 1.25, margin: "18px 0 0", letterSpacing: "-0.02em" }}>
               ابتسامتك تستاهل عناية حقيقية
             </h1>
             <p style={{ fontSize: "1.15rem", color: "var(--color-ink-soft)", marginTop: 18, maxWidth: 480 }}>
-              {clinicInfo.name} — احجز موعدك أونلاين في أقل من دقيقة، بدون دفع وبدون انتظار موافقة.
+              {clinicInfo.name} — {clinicInfo.doctorQualification}. احجز موعدك أونلاين في أقل من دقيقة، بدون دفع وبدون انتظار موافقة.
             </p>
             <div style={{ display: "flex", flexWrap: "wrap", gap: 14, marginTop: 32 }}>
               <Link href="/book" className="btn btn-primary" style={{ fontSize: "1.05rem" }}>
                 احجز موعدك الآن
               </Link>
-              {clinicInfo.phone && (
-                <a href={`tel:${clinicInfo.phone}`} className="btn btn-outline" style={{ fontSize: "1.05rem" }}>
-                  اتصل بالعيادة
-                </a>
-              )}
+              <a href={clinicInfo.phoneHref} className="btn btn-outline" style={{ fontSize: "1.05rem" }}>
+                اتصل بالعيادة
+              </a>
             </div>
           </div>
 
@@ -93,7 +74,7 @@ export default async function HomePage() {
             >
               <img
                 src={asset("doctor-photo.jpg")}
-                alt={clinicInfo.name}
+                alt={clinicInfo.doctorName}
                 style={{ width: "100%", height: "100%", objectFit: "cover" }}
               />
             </div>
@@ -116,33 +97,62 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* Services */}
-      {services.length > 0 && (
-        <section className="section" style={{ background: "var(--color-bg-soft)" }}>
-          <div className="container">
-            <div className="section-head">
-              <span className="eyebrow">خدماتنا</span>
-              <h2 className="section-title">كل احتياجات أسنانك في مكان واحد</h2>
-              <p className="section-subtitle">فريق متخصص وأحدث الأجهزة لعلاج شامل وآمن.</p>
-            </div>
-            <div className="grid-auto">
-              {services.map((service) => (
-                <div key={service.id as string} className="card" style={{ padding: 24, display: "flex", gap: 16, alignItems: "flex-start" }}>
-                  <div className="icon-badge">
-                    <IconTooth />
-                  </div>
-                  <div>
-                    <strong style={{ fontSize: "1.02rem" }}>{service.name as string}</strong>
-                    <p style={{ margin: "6px 0 0", color: "var(--color-ink-soft)", fontSize: "0.88rem" }}>
-                      مدة الجلسة: {service.duration_min_minutes as number}–{service.duration_max_minutes as number} دقيقة
-                    </p>
-                  </div>
-                </div>
-              ))}
-            </div>
+      {/* Services preview */}
+      <section className="section" style={{ background: "var(--color-bg-soft)" }}>
+        <div className="container">
+          <div className="section-head">
+            <span className="eyebrow">خدماتنا</span>
+            <h2 className="section-title">كل احتياجات أسنانك في مكان واحد</h2>
+            <p className="section-subtitle">فريق متخصص وأحدث الأجهزة لعلاج شامل وآمن.</p>
           </div>
-        </section>
-      )}
+          <div className="grid-auto">
+            {displayServices.slice(0, 6).map((service) => (
+              <div key={service.name} className="card" style={{ padding: 24, display: "flex", gap: 16, alignItems: "flex-start" }}>
+                <div className="icon-badge">
+                  <IconTooth />
+                </div>
+                <div>
+                  <strong style={{ fontSize: "1.02rem" }}>{service.name}</strong>
+                  <p style={{ margin: "6px 0 0", color: "var(--color-ink-soft)", fontSize: "0.88rem" }}>{service.desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+          <div style={{ textAlign: "center", marginTop: 36 }}>
+            <Link href="/services" className="btn btn-outline">
+              كل الخدمات
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* About preview */}
+      <section className="section">
+        <div className="container about-grid" style={{ display: "grid", gridTemplateColumns: "0.8fr 1.2fr", gap: 48, alignItems: "center" }}>
+          <div
+            style={{
+              borderRadius: 24,
+              overflow: "hidden",
+              boxShadow: "var(--shadow-card)",
+              aspectRatio: "1 / 1",
+              maxWidth: 320,
+            }}
+          >
+            <img src={asset("doctor-photo.jpg")} alt={clinicInfo.doctorName} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+          </div>
+          <div>
+            <span className="eyebrow">عن الدكتور</span>
+            <h2 className="section-title" style={{ textAlign: "start" }}>
+              {clinicInfo.doctorName}
+            </h2>
+            <p style={{ color: "var(--color-ink-soft)", fontSize: "1.02rem", marginBottom: 6 }}>{clinicInfo.doctorTitle}</p>
+            <p style={{ color: "var(--color-ink-soft)", fontSize: "1.02rem" }}>{clinicInfo.doctorQualification}</p>
+            <Link href="/about" className="btn btn-outline" style={{ marginTop: 16 }}>
+              اعرف أكتر
+            </Link>
+          </div>
+        </div>
+      </section>
 
       {/* CTA band */}
       <section style={{ padding: "72px 0" }}>
