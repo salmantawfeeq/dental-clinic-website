@@ -60,7 +60,7 @@ export default function AboutPage() {
         <div className="container">
           <div className="grid-auto">
             {highlights.map((h) => (
-              <div key={h.title} className="card" style={{ padding: 24, display: "flex", gap: 16, alignItems: "flex-start" }}>
+              <div key={h.title} className="feature-item">
                 <div className="icon-badge">{h.icon}</div>
                 <div>
                   <strong style={{ fontSize: "0.98rem" }}>{h.title}</strong>

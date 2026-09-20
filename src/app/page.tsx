@@ -137,10 +137,12 @@ export default function HomePage() {
           </div>
           <div className="grid-auto">
             {clinicFeatures.map((f) => (
-              <div key={f.title} className="card interactive" style={{ padding: 24, height: "100%" }}>
+              <div key={f.title} className="feature-item">
                 <div className="icon-badge">{f.icon}</div>
-                <h3 style={{ margin: "16px 0 6px", fontSize: "1.02rem" }}>{f.title}</h3>
-                <p style={{ margin: 0, color: "var(--color-ink-soft)", fontSize: "0.92rem" }}>{f.desc}</p>
+                <div>
+                  <h3 style={{ margin: "0 0 6px", fontSize: "1.02rem" }}>{f.title}</h3>
+                  <p style={{ margin: 0, color: "var(--color-ink-soft)", fontSize: "0.92rem" }}>{f.desc}</p>
+                </div>
               </div>
             ))}
           </div>
@@ -152,10 +154,12 @@ export default function HomePage() {
         <div className="container">
           <div className="grid-auto">
             {trustPoints.map((point) => (
-              <div key={point.title} className="card interactive" style={{ padding: 24, height: "100%" }}>
+              <div key={point.title} className="feature-item">
                 <div className="icon-badge">{point.icon}</div>
-                <h3 style={{ margin: "16px 0 6px", fontSize: "1.02rem" }}>{point.title}</h3>
-                <p style={{ margin: 0, color: "var(--color-ink-soft)", fontSize: "0.92rem" }}>{point.desc}</p>
+                <div>
+                  <h3 style={{ margin: "0 0 6px", fontSize: "1.02rem" }}>{point.title}</h3>
+                  <p style={{ margin: 0, color: "var(--color-ink-soft)", fontSize: "0.92rem" }}>{point.desc}</p>
+                </div>
               </div>
             ))}
           </div>
@@ -208,7 +212,7 @@ export default function HomePage() {
           </div>
           <div className="grid-auto">
             {displayServices.slice(0, 3).map((service) => (
-              <div key={service.name} className="card interactive" style={{ padding: 24, display: "flex", gap: 16, alignItems: "flex-start", height: "100%" }}>
+              <div key={service.name} className="feature-item">
                 <div className="icon-badge">
                   <IconTooth />
                 </div>
