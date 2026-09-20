@@ -242,7 +242,6 @@ export default function HomePage() {
           <div className="section-head">
             <span className="eyebrow">آراء مرضانا</span>
             <h2 className="section-title">كلام حقيقي من مرضى حقيقيين</h2>
-            <p className="section-subtitle">آراء من فيسبوك وواتساب — بدون أسماء بناءً على طلب العيادة.</p>
           </div>
           <div className="grid-auto">
             {testimonials.map((t, i) => (
