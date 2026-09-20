@@ -4,15 +4,8 @@ import { SiteFooter } from "@/components/SiteFooter";
 import { clinicInfo } from "@/lib/clinicInfo";
 import { displayServices } from "@/lib/services";
 import { asset } from "@/lib/basePath";
-import { IconTooth, IconShield, IconCalendarCheck, IconWallet, IconSparkle, IconClock, IconGraduationCap, IconQuote } from "@/components/icons";
+import { IconTooth, IconShield, IconSparkle, IconClock, IconGraduationCap, IconQuote } from "@/components/icons";
 import { testimonials } from "@/lib/testimonials";
-
-const trustPoints = [
-  { icon: <IconCalendarCheck />, title: "حجز فوري بدون انتظار", desc: "موعدك بيتأكد لحظة الحجز مباشرة، من غير ما تنتظر رد من حد." },
-  { icon: <IconWallet />, title: "بدون أي رسوم", desc: "الحجز الأونلاين مجاني بالكامل — تدفع في العيادة وقت الكشف بس." },
-  { icon: <IconShield />, title: "بياناتك محفوظة وآمنة", desc: "معلوماتك بتتحفظ في ملفك الطبي داخل العيادة، مش بتتشارك مع حد." },
-  { icon: <IconSparkle />, title: "خطة علاج مخصصة ليك", desc: "كل حالة بتتقيّم لوحدها وبتاخد خطة علاج تناسبها، مش حل واحد للكل." },
-];
 
 const stats = [
   { number: `${displayServices.length}+`, label: "خدمة متخصصة تحت سقف واحد" },
@@ -143,23 +136,6 @@ export default function HomePage() {
                 <div>
                   <h3 style={{ margin: "0 0 6px", fontSize: "1.02rem" }}>{f.title}</h3>
                   <p style={{ margin: 0, color: "var(--color-ink-soft)", fontSize: "0.92rem" }}>{f.desc}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Trust points */}
-      <section className="section" style={{ paddingTop: 0 }}>
-        <div className="container">
-          <div className="grid-auto">
-            {trustPoints.map((point) => (
-              <div key={point.title} className="feature-item">
-                <div className="icon-badge">{point.icon}</div>
-                <div>
-                  <h3 style={{ margin: "0 0 6px", fontSize: "1.02rem" }}>{point.title}</h3>
-                  <p style={{ margin: 0, color: "var(--color-ink-soft)", fontSize: "0.92rem" }}>{point.desc}</p>
                 </div>
               </div>
             ))}
