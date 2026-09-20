@@ -16,6 +16,7 @@ export function SiteHeader() {
   const [menuOpen, setMenuOpen] = useState(false);
 
   return (
+    <>
     <header
       style={{
         borderBottom: "1px solid var(--color-border)",
@@ -84,6 +85,9 @@ export function SiteHeader() {
               {item.label}
             </Link>
           ))}
+          <Link href="/book" className="btn btn-primary" style={{ marginTop: 10 }} onClick={() => setMenuOpen(false)}>
+            احجز موعدك
+          </Link>
           <div className="mobile-menu-contact">
             <a href={clinicInfo.phoneHref} style={{ display: "flex", alignItems: "center", gap: 8 }}>
               <IconPhone size={18} /> اتصال
@@ -95,5 +99,7 @@ export function SiteHeader() {
         </div>
       )}
     </header>
+    {menuOpen && <div className="mobile-menu-backdrop" onClick={() => setMenuOpen(false)} aria-hidden />}
+    </>
   );
 }

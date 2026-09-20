@@ -341,11 +341,15 @@ a.card:hover,
   gap: 4px;
 }
 
-.mobile-menu a {
+.mobile-menu a:not(.btn) {
   padding: 12px 4px;
   font-weight: 700;
   color: var(--color-ink);
   border-bottom: 1px solid var(--color-border);
+}
+
+.mobile-menu .btn {
+  text-align: center;
 }
 
 .mobile-menu-contact {
@@ -354,6 +358,20 @@ a.card:hover,
   padding-top: 14px;
   font-weight: 700;
   font-size: 0.95rem;
+}
+
+.mobile-menu-backdrop {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 25;
+  background: rgba(15, 23, 42, 0.25);
+}
+
+@media (max-width: 900px) {
+  .mobile-menu-backdrop {
+    display: block;
+  }
 }
 
 @media (max-width: 900px) {
@@ -370,17 +388,16 @@ a.card:hover,
 
 @media (max-width: 640px) {
   .header-logo-name {
-    font-size: 0.85rem;
+    font-size: 0.8rem;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    max-width: 32vw;
+    max-width: 58vw;
   }
   .header-icon-link {
     display: none !important;
   }
   .header-contact .btn {
-    padding: 10px 16px !important;
-    font-size: 0.85rem !important;
+    display: none;
   }
 }
