@@ -24,31 +24,69 @@ export function SiteFooter() {
             </span>
             <strong style={{ color: "white", fontSize: "1.05rem" }}>{clinicInfo.name}</strong>
           </div>
-          <p style={{ fontSize: "0.9rem", lineHeight: 1.8, margin: "0 0 16px", color: "rgba(255,255,255,0.65)" }}>
+          <p style={{ fontSize: "0.9rem", lineHeight: 1.8, margin: 0, color: "rgba(255,255,255,0.65)" }}>
             {clinicInfo.doctorTitle} — {clinicInfo.doctorQualification}
           </p>
-          <div style={{ display: "flex", gap: 12 }}>
-            <a href={clinicInfo.whatsappHref} target="_blank" rel="noopener noreferrer" aria-label="واتساب" style={{ color: "rgba(255,255,255,0.8)" }}>
-              <IconWhatsapp size={22} />
-            </a>
-            {clinicInfo.facebookUrl && (
-              <a href={clinicInfo.facebookUrl} target="_blank" rel="noopener noreferrer" aria-label="فيسبوك" style={{ color: "rgba(255,255,255,0.8)" }}>
-                <IconFacebook size={22} />
-              </a>
-            )}
-          </div>
         </div>
 
         <div style={{ display: "grid", gap: 14, fontSize: "0.9rem" }}>
           <strong style={{ color: "white", marginBottom: 4 }}>تواصل معانا</strong>
-          <a href={clinicInfo.phoneHref} style={{ display: "flex", alignItems: "center", gap: 10, color: "rgba(255,255,255,0.8)" }}>
-            <IconPhone size={18} />
-            <span dir="ltr">{clinicInfo.phoneDisplay}</span>
-          </a>
-          <a href={clinicInfo.whatsappHref} target="_blank" rel="noopener noreferrer" style={{ display: "flex", alignItems: "center", gap: 10, color: "rgba(255,255,255,0.8)" }}>
-            <IconWhatsapp size={18} />
-            <span dir="ltr">{clinicInfo.whatsappDisplay}</span>
-          </a>
+          <div style={{ display: "flex", gap: 12 }}>
+            <a
+              href={clinicInfo.phoneHref}
+              aria-label="اتصال"
+              style={{
+                width: 38,
+                height: 38,
+                borderRadius: "50%",
+                background: "rgba(255,255,255,0.12)",
+                color: "white",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <IconPhone size={18} />
+            </a>
+            <a
+              href={clinicInfo.whatsappHref}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="واتساب"
+              style={{
+                width: 38,
+                height: 38,
+                borderRadius: "50%",
+                background: "rgba(255,255,255,0.12)",
+                color: "white",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <IconWhatsapp size={18} />
+            </a>
+            {clinicInfo.facebookUrl && (
+              <a
+                href={clinicInfo.facebookUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="فيسبوك"
+                style={{
+                  width: 38,
+                  height: 38,
+                  borderRadius: "50%",
+                  background: "rgba(255,255,255,0.12)",
+                  color: "white",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <IconFacebook size={18} />
+              </a>
+            )}
+          </div>
           <a
             href={clinicInfo.mapDirectionsUrl}
             target="_blank"

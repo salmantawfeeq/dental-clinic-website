@@ -44,6 +44,22 @@ export default function ContactPage() {
               </span>
             </a>
 
+            {clinicInfo.facebookUrl && (
+              <a
+                href={clinicInfo.facebookUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="card"
+                style={{ padding: 28, display: "flex", flexDirection: "column", gap: 12, alignItems: "center", textAlign: "center" }}
+              >
+                <div className="icon-badge">
+                  <IconFacebook />
+                </div>
+                <strong>فيسبوك</strong>
+                <span style={{ color: "var(--color-ink-soft)" }}>تابعنا لآخر الأخبار والعروض</span>
+              </a>
+            )}
+
             <div className="card interactive" style={{ padding: 28, display: "flex", flexDirection: "column", gap: 12, alignItems: "center", textAlign: "center" }}>
               <div className="icon-badge">
                 <IconClock />
@@ -65,22 +81,6 @@ export default function ContactPage() {
               <strong>موقع العيادة</strong>
               <span style={{ color: "var(--color-ink-soft)" }}>{clinicInfo.address || "احصل على الاتجاهات"}</span>
             </a>
-
-            {clinicInfo.facebookUrl && (
-              <a
-                href={clinicInfo.facebookUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="card"
-                style={{ padding: 28, display: "flex", flexDirection: "column", gap: 12, alignItems: "center", textAlign: "center" }}
-              >
-                <div className="icon-badge">
-                  <IconFacebook />
-                </div>
-                <strong>فيسبوك</strong>
-                <span style={{ color: "var(--color-ink-soft)" }}>تابعنا لآخر الأخبار والعروض</span>
-              </a>
-            )}
           </div>
 
           <div

@@ -1,22 +1,21 @@
 import Link from "next/link";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
-import { HeroIllustration } from "@/components/HeroIllustration";
 import { clinicInfo } from "@/lib/clinicInfo";
 import { displayServices } from "@/lib/services";
 import { asset } from "@/lib/basePath";
-import { IconTooth, IconClock, IconShield, IconCalendarCheck, IconWallet, IconSparkle } from "@/components/icons";
+import { IconTooth, IconShield, IconCalendarCheck, IconWallet, IconSparkle } from "@/components/icons";
 
 const trustPoints = [
   { icon: <IconCalendarCheck />, title: "حجز فوري بدون انتظار", desc: "موعدك بيتأكد لحظة الحجز مباشرة، من غير ما تنتظر رد من حد." },
   { icon: <IconWallet />, title: "بدون أي رسوم", desc: "الحجز الأونلاين مجاني بالكامل — تدفع في العيادة وقت الكشف بس." },
   { icon: <IconShield />, title: "بياناتك محفوظة وآمنة", desc: "معلوماتك بتتحفظ في ملفك الطبي داخل العيادة، مش بتتشارك مع حد." },
-  { icon: <IconClock />, title: "مواعيد مسائية مريحة", desc: clinicInfo.hours + "، تختار الوقت المناسب لك." },
+  { icon: <IconSparkle />, title: "خطة علاج مخصصة ليك", desc: "كل حالة بتتقيّم لوحدها وبتاخد خطة علاج تناسبها، مش حل واحد للكل." },
 ];
 
 const stats = [
   { number: `${displayServices.length}+`, label: "خدمة متخصصة تحت سقف واحد" },
-  { number: "7", label: "أيام في الأسبوع فاتحين" },
+  { number: "24/7", label: "الحجز الأونلاين متاح في أي وقت" },
   { number: "0", label: "جنيه رسوم على الحجز الأونلاين" },
   { number: "1", label: "دقيقة بس لتأكيد ميعادك" },
 ];
@@ -93,7 +92,11 @@ export default function HomePage() {
                 aspectRatio: "4 / 5",
               }}
             >
-              <HeroIllustration />
+              <img
+                src={asset("doctor-photo.jpg")}
+                alt={clinicInfo.doctorName}
+                style={{ width: "100%", height: "100%", objectFit: "cover" }}
+              />
             </div>
           </div>
         </div>
