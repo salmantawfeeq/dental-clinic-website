@@ -14,11 +14,11 @@ export default function ContactPage() {
           <div className="section-head">
             <span className="eyebrow">تواصل معنا</span>
             <h1 className="section-title">إحنا هنا لأي استفسار</h1>
-            <p className="section-subtitle">اتصل، ابعت واتساب، أو احجز موعدك مباشرة أونلاين.</p>
+            <p className="section-subtitle">اتصل، ابعت واتساب، أو احجز موعدك مباشر أونلاين.</p>
           </div>
 
           <div className="grid-auto" style={{ maxWidth: 900, margin: "0 auto" }}>
-            <a href={clinicInfo.phoneHref} className="card" style={{ padding: 28, display: "flex", flexDirection: "column", gap: 12, alignItems: "center", textAlign: "center" }}>
+            <a href={clinicInfo.phoneHref} className="card interactive" style={{ padding: 28, display: "flex", flexDirection: "column", gap: 12, alignItems: "center", textAlign: "center" }}>
               <div className="icon-badge">
                 <IconPhone />
               </div>
@@ -44,7 +44,7 @@ export default function ContactPage() {
               </span>
             </a>
 
-            <div className="card" style={{ padding: 28, display: "flex", flexDirection: "column", gap: 12, alignItems: "center", textAlign: "center" }}>
+            <div className="card interactive" style={{ padding: 28, display: "flex", flexDirection: "column", gap: 12, alignItems: "center", textAlign: "center" }}>
               <div className="icon-badge">
                 <IconClock />
               </div>

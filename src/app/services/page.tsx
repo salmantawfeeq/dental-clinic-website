@@ -19,7 +19,7 @@ export default function ServicesPage() {
 
           <div className="grid-auto">
             {displayServices.map((service) => (
-              <div key={service.name} className="card" style={{ padding: 28, display: "flex", gap: 16, alignItems: "flex-start" }}>
+              <div key={service.name} className="card interactive" style={{ padding: 28, display: "flex", gap: 16, alignItems: "flex-start" }}>
                 <div className="icon-badge">
                   <IconTooth />
                 </div>
