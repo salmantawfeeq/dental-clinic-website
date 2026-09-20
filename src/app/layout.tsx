@@ -9,7 +9,7 @@ const toothFavicon =
   "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ctext y='19' font-size='20'%3E%F0%9F%A6%B7%3C/text%3E%3C/svg%3E";
 
 export const metadata: Metadata = {
-  title: `${clinicInfo.name} — احجز موعدك أونلاين`,
+  title: clinicInfo.name,
   description: `احجز موعدك في ${clinicInfo.name} أونلاين في أقل من دقيقة، بدون دفع وبدون انتظار موافقة.`,
   icons: { icon: toothFavicon },
 };
