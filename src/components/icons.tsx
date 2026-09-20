@@ -122,3 +122,11 @@ export function IconClose({ size = 24 }: IconProps) {
     </svg>
   );
 }
+
+export function IconQuote({ size = 24 }: IconProps) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor">
+      <path d="M7.2 6C4.9 7.3 3.5 9.4 3.5 12c0 2.2 1.3 3.8 3.2 3.8 1.7 0 3-1.3 3-3 0-1.6-1.1-2.8-2.6-2.9.3-1.4 1.3-2.6 2.7-3.4L7.2 6Zm9.3 0c-2.3 1.3-3.7 3.4-3.7 6 0 2.2 1.3 3.8 3.2 3.8 1.7 0 3-1.3 3-3 0-1.6-1.1-2.8-2.6-2.9.3-1.4 1.3-2.6 2.7-3.4L16.5 6Z" />
+    </svg>
+  );
+}
