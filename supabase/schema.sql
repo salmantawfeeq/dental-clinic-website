@@ -24,9 +24,11 @@ create table if not exists public.busy_slots (
 
 create table if not exists public.online_bookings (
   id uuid primary key default gen_random_uuid(),
-  patient_full_name text not null,
+  -- بند (طلب الدكتور 2026-09-22): الاسم الثلاثي وتاريخ الميلاد إجباريين — المطابقة مع النظام الداخلي
+  -- بقت بالاسم الثلاثي (مش برقم الموبايل، لأن أكتر من مريض بيستخدموا نفس الرقم فعليًا).
+  patient_full_name text not null check (array_length(regexp_split_to_array(trim(patient_full_name), '\s+'), 1) >= 3),
   patient_phone text not null,
-  patient_date_of_birth date,
+  patient_date_of_birth date not null,
   service_id uuid not null references public.services(id),
   scheduled_at timestamptz not null,
   status text not null default 'pending_sync' check (status in ('pending_sync', 'synced', 'failed')),

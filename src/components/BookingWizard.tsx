@@ -102,12 +102,17 @@ export function BookingWizard({ services }: { services: Service[] }) {
   async function handleSubmit() {
     setErrorMessage(null);
 
-    if (!fullName.trim()) {
-      setErrorMessage("من فضلك اكتب الاسم بالكامل");
+    const normalizedName = fullName.trim().replace(/\s+/g, " ");
+    if (normalizedName.split(" ").length < 3) {
+      setErrorMessage("من فضلك اكتب الاسم الثلاثي بالكامل (الاسم + اسم الأب + اسم الجد على الأقل)");
       return;
     }
     if (!EGYPT_PHONE_PATTERN.test(phone.trim())) {
       setErrorMessage("رقم الموبايل غير صحيح — لازم يبدأ بـ 010 أو 011 أو 012 أو 015 ويتكون من 11 رقم");
+      return;
+    }
+    if (!dateOfBirth) {
+      setErrorMessage("من فضلك اختار تاريخ الميلاد");
       return;
     }
     if (!serviceId || !scheduledAt) {
@@ -134,9 +139,9 @@ export function BookingWizard({ services }: { services: Service[] }) {
       const { error: insertError } = await supabase.from("online_bookings").insert({
         service_id: serviceId,
         scheduled_at: scheduledAt,
-        patient_full_name: fullName.trim(),
+        patient_full_name: normalizedName,
         patient_phone: phone.trim(),
-        patient_date_of_birth: dateOfBirth || null,
+        patient_date_of_birth: dateOfBirth,
         status: "pending_sync",
       });
 
@@ -245,12 +250,12 @@ export function BookingWizard({ services }: { services: Service[] }) {
       {step === 2 && (
         <div style={{ marginTop: 20, display: "grid", gap: 16 }}>
           <label style={{ display: "grid", gap: 6 }}>
-            <span>الاسم بالكامل</span>
+            <span>الاسم الثلاثي بالكامل</span>
             <input
               value={fullName}
               onChange={(e) => setFullName(e.target.value)}
               style={inputStyle}
-              placeholder="اكتب اسمك بالكامل"
+              placeholder="مثال: محمد أحمد علي"
             />
           </label>
           <label style={{ display: "grid", gap: 6 }}>
@@ -265,8 +270,8 @@ export function BookingWizard({ services }: { services: Service[] }) {
             />
           </label>
           <label style={{ display: "grid", gap: 6 }}>
-            <span>تاريخ الميلاد (اختياري)</span>
-            <input type="date" value={dateOfBirth} onChange={(e) => setDateOfBirth(e.target.value)} style={inputStyle} />
+            <span>تاريخ الميلاد</span>
+            <input type="date" value={dateOfBirth} onChange={(e) => setDateOfBirth(e.target.value)} style={inputStyle} required />
           </label>
 
           {errorMessage && <p style={{ color: "var(--color-danger)", margin: 0 }}>{errorMessage}</p>}
