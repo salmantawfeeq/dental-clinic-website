@@ -169,7 +169,7 @@ export function BookingWizard({ services }: { services: Service[] }) {
         <p style={{ color: "var(--color-ink-soft)" }}>
           {selectedService?.name} — {confirmed.date} الساعة {confirmed.time}
         </p>
-        <p style={{ color: "var(--color-ink-soft)", fontSize: "0.9rem" }}>تقدر تتأخر أو تلغي بالاتصال بالعيادة.</p>
+        <p style={{ color: "var(--color-ink-soft)", fontSize: "0.9rem" }}>تقدر تتأخر أو تلغي عن طريق الاتصال بالعيادة.</p>
       </div>
     );
   }
