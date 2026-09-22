@@ -16,3 +16,10 @@ export function buildCairoISOString(year: number, month: number, day: number, ho
 export function nowInCairo(): Date {
   return new Date(new Date().toLocaleString("en-US", { timeZone: "Africa/Cairo" }));
 }
+
+/** بيحول الساعة (24) لصيغة 12 ساعة بصباحًا/مساءً — بدل 16:00 بيطلع 4:00 م. */
+export function formatTime12h(hour: number, minute: number): string {
+  const period = hour >= 12 ? "م" : "ص";
+  const hour12 = hour % 12 === 0 ? 12 : hour % 12;
+  return `${hour12}:${String(minute).padStart(2, "0")} ${period}`;
+}

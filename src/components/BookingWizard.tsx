@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { getSupabasePublic } from "@/lib/supabasePublic";
-import { buildCairoISOString, nowInCairo, CLINIC_OPEN_HOUR, CLINIC_CLOSE_HOUR, SLOT_STEP_MINUTES } from "@/lib/clinicHours";
+import { buildCairoISOString, nowInCairo, formatTime12h, CLINIC_OPEN_HOUR, CLINIC_CLOSE_HOUR, SLOT_STEP_MINUTES } from "@/lib/clinicHours";
 
 interface Service {
   id: string;
@@ -63,7 +63,7 @@ async function fetchSlotsForDay(date: string, serviceId: string): Promise<Slot[]
 
     slots.push({
       scheduledAt: scheduledAt.toISOString(),
-      time: `${String(hour).padStart(2, "0")}:${String(minute).padStart(2, "0")}`,
+      time: formatTime12h(hour, minute),
       available: !occupied.has(scheduledAt.toISOString()),
     });
   }
@@ -169,9 +169,7 @@ export function BookingWizard({ services }: { services: Service[] }) {
         <p style={{ color: "var(--color-ink-soft)" }}>
           {selectedService?.name} — {confirmed.date} الساعة {confirmed.time}
         </p>
-        <p style={{ color: "var(--color-ink-soft)", fontSize: "0.9rem" }}>
-          هيوصلك تأكيد على رقم {phone}. تقدر تتأخر أو تلغي بالاتصال بالعيادة.
-        </p>
+        <p style={{ color: "var(--color-ink-soft)", fontSize: "0.9rem" }}>تقدر تتأخر أو تلغي بالاتصال بالعيادة.</p>
       </div>
     );
   }
