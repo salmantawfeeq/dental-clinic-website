@@ -5,7 +5,7 @@ import { IconMapPin, IconPhone, IconClock, IconWhatsapp, IconFacebook } from "./
 export function SiteFooter() {
   return (
     <footer style={{ background: "var(--color-primary-darker)", color: "rgba(255,255,255,0.85)", marginTop: 80 }}>
-      <div className="container" style={{ padding: "56px 0 32px", display: "grid", gap: 32, gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))" }}>
+      <div className="container" style={{ paddingTop: 56, paddingBottom: 32, display: "grid", gap: 32, gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))" }}>
         <div>
           <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 14 }}>
             <span
@@ -123,7 +123,7 @@ export function SiteFooter() {
       </div>
 
       <div style={{ borderTop: "1px solid rgba(255,255,255,0.12)" }}>
-        <div className="container" style={{ padding: "18px 0", fontSize: "0.8rem", color: "rgba(255,255,255,0.55)" }}>
+        <div className="container" style={{ paddingTop: 18, paddingBottom: 18, fontSize: "0.8rem", color: "rgba(255,255,255,0.55)" }}>
           © {new Date().getFullYear()} {clinicInfo.name} — جميع الحقوق محفوظة.
         </div>
       </div>

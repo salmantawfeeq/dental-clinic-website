@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { getSupabasePublic } from "@/lib/supabasePublic";
 import { buildCairoISOString, nowInCairo, formatTime12h, CLINIC_OPEN_HOUR, CLINIC_CLOSE_HOUR, SLOT_STEP_MINUTES } from "@/lib/clinicHours";
 
@@ -88,6 +88,23 @@ export function BookingWizard({ services }: { services: Service[] }) {
 
   const days = useMemo(() => nextDays(14), []);
   const selectedService = services.find((s) => s.id === serviceId) ?? null;
+  const cardRef = useRef<HTMLDivElement>(null);
+
+  // بند: لو المستخدم مرّر تحت لآخر خدمة في الليستة واختارها، كان بينتقل لخطوة التاريخ/الوقت من غير
+  // ما الشاشة ترجع لفوق — فكان محتاج يمرّر لفوق تاني بنفسه عشان يشوف الخطوة الجديدة. بنعمل الرجوع
+  // لفوق تلقائي مع كل خطوة، وبناخد في الاعتبار ارتفاع الهيدر الثابت (78px) عشان الكارت ميختفيش تحته.
+  const isFirstRender = useRef(true);
+  useEffect(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      return;
+    }
+    const node = cardRef.current;
+    if (!node) return;
+    const headerOffset = 90;
+    const top = node.getBoundingClientRect().top + window.scrollY - headerOffset;
+    window.scrollTo({ top, behavior: "smooth" });
+  }, [step]);
 
   useEffect(() => {
     if (!serviceId || !date) return;
@@ -180,7 +197,7 @@ export function BookingWizard({ services }: { services: Service[] }) {
   }
 
   return (
-    <div className="card" style={{ padding: 24 }}>
+    <div className="card" style={{ padding: 24 }} ref={cardRef}>
       <StepIndicator step={step} />
 
       {step === 0 && (
