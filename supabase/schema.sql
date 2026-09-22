@@ -28,7 +28,8 @@ create table if not exists public.online_bookings (
   -- بقت بالاسم الثلاثي (مش برقم الموبايل، لأن أكتر من مريض بيستخدموا نفس الرقم فعليًا).
   patient_full_name text not null check (array_length(regexp_split_to_array(trim(patient_full_name), '\s+'), 1) >= 3),
   patient_phone text not null,
-  patient_date_of_birth date not null,
+  -- بند (طلب الدكتور 2026-09-22): عمر المريض لازم يكون سنة على الأقل (منع كتابة تاريخ اليوم أو تاريخ قريب غلط).
+  patient_date_of_birth date not null check (patient_date_of_birth <= current_date - interval '1 year'),
   service_id uuid not null references public.services(id),
   scheduled_at timestamptz not null,
   status text not null default 'pending_sync' check (status in ('pending_sync', 'synced', 'failed')),
