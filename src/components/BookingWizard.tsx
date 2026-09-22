@@ -90,6 +90,19 @@ export function BookingWizard({ services }: { services: Service[] }) {
   const selectedService = services.find((s) => s.id === serviceId) ?? null;
   const cardRef = useRef<HTMLDivElement>(null);
 
+  // أصغر تاريخ ميلاد مسموح بيه — لازم يكون عمر المريض سنة على الأقل (منع كتابة تاريخ اليوم أو تاريخ قريب غلط).
+  const maxDateOfBirth = useMemo(() => {
+    const d = new Date();
+    d.setFullYear(d.getFullYear() - 1);
+    return d;
+  }, []);
+  const maxDateOfBirthValue = useMemo(() => {
+    const y = maxDateOfBirth.getFullYear();
+    const m = String(maxDateOfBirth.getMonth() + 1).padStart(2, "0");
+    const d = String(maxDateOfBirth.getDate()).padStart(2, "0");
+    return `${y}-${m}-${d}`;
+  }, [maxDateOfBirth]);
+
   // بند: لو المستخدم مرّر تحت لآخر خدمة في الليستة واختارها، كان بينتقل لخطوة التاريخ/الوقت من غير
   // ما الشاشة ترجع لفوق — فكان محتاج يمرّر لفوق تاني بنفسه عشان يشوف الخطوة الجديدة. بنعمل الرجوع
   // لفوق تلقائي مع كل خطوة، وبناخد في الاعتبار ارتفاع الهيدر الثابت (78px) عشان الكارت ميختفيش تحته.
@@ -130,6 +143,10 @@ export function BookingWizard({ services }: { services: Service[] }) {
     }
     if (!dateOfBirth) {
       setErrorMessage("من فضلك اختار تاريخ الميلاد");
+      return;
+    }
+    if (new Date(dateOfBirth) > maxDateOfBirth) {
+      setErrorMessage("تاريخ الميلاد غير صحيح — لازم يكون عمر المريض سنة على الأقل");
       return;
     }
     if (!serviceId || !scheduledAt) {
@@ -288,7 +305,14 @@ export function BookingWizard({ services }: { services: Service[] }) {
           </label>
           <label style={{ display: "grid", gap: 6 }}>
             <span>تاريخ الميلاد</span>
-            <input type="date" value={dateOfBirth} onChange={(e) => setDateOfBirth(e.target.value)} style={inputStyle} required />
+            <input
+              type="date"
+              value={dateOfBirth}
+              onChange={(e) => setDateOfBirth(e.target.value)}
+              style={inputStyle}
+              max={maxDateOfBirthValue}
+              required
+            />
           </label>
 
           {errorMessage && <p style={{ color: "var(--color-danger)", margin: 0 }}>{errorMessage}</p>}
