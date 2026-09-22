@@ -81,7 +81,9 @@ export function BookingWizard({ services }: { services: Service[] }) {
   const [scheduledAt, setScheduledAt] = useState<string | null>(null);
   const [fullName, setFullName] = useState("");
   const [phone, setPhone] = useState("");
-  const [dateOfBirth, setDateOfBirth] = useState("");
+  const [dobDay, setDobDay] = useState("");
+  const [dobMonth, setDobMonth] = useState("");
+  const [dobYear, setDobYear] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [confirmed, setConfirmed] = useState<{ time: string; date: string } | null>(null);
@@ -102,6 +104,18 @@ export function BookingWizard({ services }: { services: Service[] }) {
     const d = String(maxDateOfBirth.getDate()).padStart(2, "0");
     return `${y}-${m}-${d}`;
   }, [maxDateOfBirth]);
+
+  // بند: تاريخ الميلاد بيتكتب يدوي (يوم/شهر/سنة) بدل قايمة الاختيار الافتراضية بتاعة input[type=date].
+  function buildDateOfBirth(): string | null {
+    const day = Number(dobDay);
+    const month = Number(dobMonth);
+    const year = Number(dobYear);
+    if (!day || !month || !year || dobYear.length !== 4) return null;
+    const d = new Date(year, month - 1, day);
+    if (d.getFullYear() !== year || d.getMonth() !== month - 1 || d.getDate() !== day) return null;
+    const pad = (n: number) => String(n).padStart(2, "0");
+    return `${year}-${pad(month)}-${pad(day)}`;
+  }
 
   // بند: لو المستخدم مرّر تحت لآخر خدمة في الليستة واختارها، كان بينتقل لخطوة التاريخ/الوقت من غير
   // ما الشاشة ترجع لفوق — فكان محتاج يمرّر لفوق تاني بنفسه عشان يشوف الخطوة الجديدة. بنعمل الرجوع
@@ -141,8 +155,9 @@ export function BookingWizard({ services }: { services: Service[] }) {
       setErrorMessage("رقم الموبايل غير صحيح — لازم يبدأ بـ 010 أو 011 أو 012 أو 015 ويتكون من 11 رقم");
       return;
     }
+    const dateOfBirth = buildDateOfBirth();
     if (!dateOfBirth) {
-      setErrorMessage("من فضلك اختار تاريخ الميلاد");
+      setErrorMessage("من فضلك اكتب تاريخ ميلاد صحيح (يوم/شهر/سنة)");
       return;
     }
     if (new Date(dateOfBirth) > maxDateOfBirth) {
@@ -285,34 +300,80 @@ export function BookingWizard({ services }: { services: Service[] }) {
         <div style={{ marginTop: 20, display: "grid", gap: 16 }}>
           <label style={{ display: "grid", gap: 6 }}>
             <span>الاسم الثلاثي بالكامل</span>
-            <input
-              value={fullName}
-              onChange={(e) => setFullName(e.target.value)}
-              style={inputStyle}
-              placeholder="مثال: محمد أحمد علي"
-            />
+            <input value={fullName} onChange={(e) => setFullName(e.target.value)} style={inputStyle} />
           </label>
           <label style={{ display: "grid", gap: 6 }}>
             <span>رقم الموبايل</span>
             <input
               value={phone}
-              onChange={(e) => setPhone(e.target.value)}
+              onChange={(e) => setPhone(e.target.value.replace(/\D/g, "").slice(0, 11))}
               style={inputStyle}
               placeholder="01xxxxxxxxx"
               inputMode="numeric"
+              maxLength={11}
               dir="ltr"
             />
           </label>
           <label style={{ display: "grid", gap: 6 }}>
             <span>تاريخ الميلاد</span>
-            <input
-              type="date"
-              value={dateOfBirth}
-              onChange={(e) => setDateOfBirth(e.target.value)}
-              style={inputStyle}
-              max={maxDateOfBirthValue}
-              required
-            />
+            <div style={{ display: "flex", gap: 8 }}>
+              <input
+                value={dobDay}
+                onChange={(e) => setDobDay(e.target.value.replace(/\D/g, "").slice(0, 2))}
+                style={{ ...inputStyle, textAlign: "center", width: 0, minWidth: 0, flex: 1 }}
+                placeholder="يوم"
+                inputMode="numeric"
+                maxLength={2}
+              />
+              <input
+                value={dobMonth}
+                onChange={(e) => setDobMonth(e.target.value.replace(/\D/g, "").slice(0, 2))}
+                style={{ ...inputStyle, textAlign: "center", width: 0, minWidth: 0, flex: 1 }}
+                placeholder="شهر"
+                inputMode="numeric"
+                maxLength={2}
+              />
+              <input
+                value={dobYear}
+                onChange={(e) => setDobYear(e.target.value.replace(/\D/g, "").slice(0, 4))}
+                style={{ ...inputStyle, textAlign: "center", width: 0, minWidth: 0, flex: 1.4 }}
+                placeholder="سنة"
+                inputMode="numeric"
+                maxLength={4}
+              />
+              {/* بند: قايمة اختيار التاريخ (الكالندر الأصلي) موجودة كخيار إضافي بس — مش إجباري تستخدمها،
+                  الإدخال اليدوي في التلات مربعات فوق هو الأساسي عشان بيحصل مشاكل مع الكالندر على شاشات
+                  الموبايل (أندرويد/آيفون). اختيار تاريخ من هنا بيملى المربعات تلقائيًا. */}
+              <label
+                style={{
+                  ...inputStyle,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  width: 48,
+                  padding: 0,
+                  flexShrink: 0,
+                  cursor: "pointer",
+                  position: "relative",
+                }}
+                aria-label="اختيار تاريخ الميلاد من التقويم (اختياري)"
+              >
+                📅
+                <input
+                  type="date"
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    if (!value) return;
+                    const [y, m, d] = value.split("-");
+                    setDobYear(y ?? "");
+                    setDobMonth(m ?? "");
+                    setDobDay(d ?? "");
+                  }}
+                  max={maxDateOfBirthValue}
+                  style={{ position: "absolute", inset: 0, opacity: 0, cursor: "pointer" }}
+                />
+              </label>
+            </div>
           </label>
 
           {errorMessage && <p style={{ color: "var(--color-danger)", margin: 0 }}>{errorMessage}</p>}
