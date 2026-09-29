@@ -17,7 +17,9 @@ interface Slot {
   available: boolean;
 }
 
-const EGYPT_PHONE_PATTERN = /^01[0-2,5]\d{8}$/;
+// بند: كانت فيه فاصلة زيادة جوه [0-2,5] بتضيف الحرف "," نفسه كرقم مسموح بيه غلط (مش بس 0/1/2/5) — مأثرتش
+// عمليًا لأن onChange بيمسح أي حرف مش رقم قبل حتى ما نوصل هنا، بس بنصلحها عشان الفحص يبقى دقيق فعلًا.
+const EGYPT_PHONE_PATTERN = /^01[0125]\d{8}$/;
 
 function nextDays(count: number): { value: string; label: string }[] {
   const days: { value: string; label: string }[] = [];

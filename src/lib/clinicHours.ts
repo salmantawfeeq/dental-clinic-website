@@ -9,8 +9,13 @@ export const SLOT_STEP_MINUTES = 20;
 const CAIRO_OFFSET = "+02:00";
 
 export function buildCairoISOString(year: number, month: number, day: number, hour: number, minute: number): string {
+  // بند: كان فيه باگ حقيقي هنا — بناء السترينج يدوي (بدون تطبيع) كان بيقبل "يوم 31" حتى لشهر فيه 30 يوم بس،
+  // فبينتج تاريخ مش موجود أصلًا زي "2026-09-31" (Postgres بيرفضه بخطأ 22008). بيحصل بالظبط آخر يوم في أي
+  // شهر، لما fetchSlotsForDay بيحسب "بداية اليوم اللي بعده" بـday+1 عشان يحدد نهاية اليوم الحالي. بنستخدم
+  // Date.UTC هنا كحاسبة تقويم بس (مش تحويل توقيت حقيقي) عشان يطبّع يوم 31 في شهر سبتمبر لأول أكتوبر صح.
+  const normalized = new Date(Date.UTC(year, month - 1, day, hour, minute));
   const pad = (n: number) => String(n).padStart(2, "0");
-  return `${year}-${pad(month)}-${pad(day)}T${pad(hour)}:${pad(minute)}:00${CAIRO_OFFSET}`;
+  return `${normalized.getUTCFullYear()}-${pad(normalized.getUTCMonth() + 1)}-${pad(normalized.getUTCDate())}T${pad(normalized.getUTCHours())}:${pad(normalized.getUTCMinutes())}:00${CAIRO_OFFSET}`;
 }
 
 export function nowInCairo(): Date {
