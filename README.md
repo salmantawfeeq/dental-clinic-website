@@ -4,6 +4,12 @@ A public, Arabic-first (RTL) website for a dental clinic with a free online book
 
 **Live demo:** https://salmantawfeeq.github.io/dental-clinic-website/
 
+## Screenshots
+
+![Home page](docs/screenshots/home-page.png)
+
+![Online booking](docs/screenshots/booking.jpg)
+
 ## Features
 
 - Home, services, about and contact pages
