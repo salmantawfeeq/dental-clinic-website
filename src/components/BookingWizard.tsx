@@ -74,7 +74,9 @@ async function fetchSlotsForDay(date: string, serviceId: string): Promise<Slot[]
   return slots;
 }
 
-export function BookingWizard({ services }: { services: Service[] }) {
+export function BookingWizard() {
+  const [services, setServices] = useState<Service[]>([]);
+  const [servicesLoading, setServicesLoading] = useState(true);
   const [step, setStep] = useState(0);
   const [serviceId, setServiceId] = useState<string | null>(null);
   const [date, setDate] = useState<string | null>(null);
@@ -93,6 +95,32 @@ export function BookingWizard({ services }: { services: Service[] }) {
   const days = useMemo(() => nextDays(14), []);
   const selectedService = services.find((s) => s.id === serviceId) ?? null;
   const cardRef = useRef<HTMLDivElement>(null);
+
+  // بند: الموقع Static (مبني مرة واحدة وقت الـdeploy، مش سيرفر شغال)، فلو قائمة الخدمات كانت بتتجاب وقت
+  // البناء بس، أي خدمة جديدة أو تعطيل خدمة في برنامج العيادة كان مش هيبان على الموقع إلا بعد إعادة بناء
+  // ونشر يدوي. بنجيبها هنا في المتصفح نفسه (كل ما حد يفتح صفحة الحجز) عشان تبقى فعليًا فورية.
+  useEffect(() => {
+    let cancelled = false;
+    async function loadServices() {
+      try {
+        const supabase = getSupabasePublic();
+        const { data } = await supabase
+          .from("services")
+          .select("id, name, duration_min_minutes, duration_max_minutes")
+          .eq("is_active", true)
+          .order("display_order", { ascending: true });
+        if (!cancelled) setServices((data ?? []) as Service[]);
+      } catch {
+        if (!cancelled) setServices([]);
+      } finally {
+        if (!cancelled) setServicesLoading(false);
+      }
+    }
+    void loadServices();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   // أصغر تاريخ ميلاد مسموح بيه — لازم يكون عمر المريض سنة على الأقل (منع كتابة تاريخ اليوم أو تاريخ قريب غلط).
   const maxDateOfBirth = useMemo(() => {
@@ -236,19 +264,27 @@ export function BookingWizard({ services }: { services: Service[] }) {
 
       {step === 0 && (
         <div style={{ display: "grid", gap: 12, marginTop: 20 }}>
-          {services.map((service) => (
-            <button
-              key={service.id}
-              className={service.id === serviceId ? "btn btn-primary" : "btn btn-outline"}
-              style={{ justifyContent: "flex-start", width: "100%" }}
-              onClick={() => {
-                setServiceId(service.id);
-                setStep(1);
-              }}
-            >
-              {service.name}
-            </button>
-          ))}
+          {servicesLoading ? (
+            <p style={{ color: "var(--color-ink-soft)" }}>بنجيب الخدمات المتاحة...</p>
+          ) : services.length === 0 ? (
+            <p style={{ color: "var(--color-ink-soft)" }}>
+              تعذّر تحميل الخدمات دلوقتي — حاول تحدّث الصفحة بعد شوية.
+            </p>
+          ) : (
+            services.map((service) => (
+              <button
+                key={service.id}
+                className={service.id === serviceId ? "btn btn-primary" : "btn btn-outline"}
+                style={{ justifyContent: "flex-start", width: "100%" }}
+                onClick={() => {
+                  setServiceId(service.id);
+                  setStep(1);
+                }}
+              >
+                {service.name}
+              </button>
+            ))
+          )}
         </div>
       )}
 
