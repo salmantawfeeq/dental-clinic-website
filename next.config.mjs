@@ -11,7 +11,12 @@ const nextConfig = {
   trailingSlash: true,
   basePath,
   assetPrefix: basePath,
-  env: { NEXT_PUBLIC_BASE_PATH: basePath },
+  // NEXT_PUBLIC_SITE_URL مقروءة مباشرة من process.env في src/lib/siteConfig.ts (مع قيمة احتياطية
+  // لرابط GitHub Pages الحالي) — متحطش هنا في env: فاضية، لأن ده بيجبر القيمة تبقى "" لما الـVariable
+  // لسه مش متظبطة في الريبو، وده بيلغي القيمة الاحتياطية بتاعة ?? في siteConfig.ts.
+  env: {
+    NEXT_PUBLIC_BASE_PATH: basePath,
+  },
 };
 
 export default nextConfig;

@@ -1,8 +1,15 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { clinicInfo } from "@/lib/clinicInfo";
 import { IconPhone, IconWhatsapp, IconClock, IconMapPin, IconFacebook } from "@/components/icons";
+
+export const metadata: Metadata = {
+  title: "تواصل معنا",
+  description: `بيانات التواصل وموقع ${clinicInfo.name} — ${clinicInfo.address}. اتصل أو راسلنا على واتساب.`,
+  alternates: { canonical: "/contact/" },
+};
 
 export default function ContactPage() {
   return (
