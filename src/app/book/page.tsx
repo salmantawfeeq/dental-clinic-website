@@ -1,6 +1,14 @@
+import type { Metadata } from "next";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { BookingWizard } from "@/components/BookingWizard";
+import { clinicInfo } from "@/lib/clinicInfo";
+
+export const metadata: Metadata = {
+  title: "احجز موعدك أونلاين",
+  description: `احجز موعدك في ${clinicInfo.name} أونلاين في أقل من دقيقة، بدون دفع وبدون انتظار موافقة.`,
+  alternates: { canonical: "/book/" },
+};
 
 // بند: الموقع Static، فجلب الخدمات وقت البناء هنا كان معناه قائمة الحجز بتفضل منسوخة لحظة آخر نشر —
 // أي خدمة جديدة أو تعطيل خدمة في برنامج العيادة ميبانش غير بعد إعادة نشر يدوي. BookingWizard دلوقتي

@@ -1,9 +1,16 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { clinicInfo } from "@/lib/clinicInfo";
 import { asset } from "@/lib/basePath";
 import { IconGraduationCap, IconShield, IconSparkle } from "@/components/icons";
+
+export const metadata: Metadata = {
+  title: "عن الدكتور",
+  description: `${clinicInfo.doctorName} — ${clinicInfo.doctorTitle}، ${clinicInfo.doctorQualification}.`,
+  alternates: { canonical: "/about/" },
+};
 
 const highlights = [
   { icon: <IconGraduationCap />, title: "المؤهل العلمي", desc: clinicInfo.doctorQualification },

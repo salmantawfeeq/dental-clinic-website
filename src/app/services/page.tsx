@@ -1,8 +1,16 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { displayServices } from "@/lib/services";
+import { clinicInfo } from "@/lib/clinicInfo";
 import { IconTooth } from "@/components/icons";
+
+export const metadata: Metadata = {
+  title: "الخدمات",
+  description: `خدمات ${clinicInfo.name}: ${displayServices.map((s) => s.name).join("، ")}.`,
+  alternates: { canonical: "/services/" },
+};
 
 export default function ServicesPage() {
   return (
