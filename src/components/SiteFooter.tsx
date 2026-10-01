@@ -86,6 +86,24 @@ export function SiteFooter() {
                 <IconFacebook size={18} />
               </a>
             )}
+            <a
+              href={clinicInfo.mapDirectionsUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="الموقع على الخريطة"
+              style={{
+                width: 38,
+                height: 38,
+                borderRadius: "50%",
+                background: "rgba(255,255,255,0.12)",
+                color: "white",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <IconMapPin size={18} />
+            </a>
           </div>
           <a
             href={clinicInfo.mapDirectionsUrl}

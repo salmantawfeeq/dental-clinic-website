@@ -21,8 +21,7 @@ export const clinicInfo = {
   whatsappDisplay: "01090076485",
   whatsappHref: "https://wa.me/201090076485",
   hours: "يوميًا (السبت–الجمعة) من 4 عصرًا حتى 11 مساءً",
-  // النص المكتوب للعنوان (شارع/منطقة) لسه هيتبعت من الدكتور — الإحداثيات والخريطة تحت موجودة فعلاً.
-  address: "",
+  address: "منشأة عبد الرحمن - دكرنس - الدقهلية",
   facebookUrl: "https://www.facebook.com/share/1CFK58r1kW/?mibextid=wwXIfr",
   // من لينك خرائط جوجل اللي بعته الدكتور (محافظة الدقهلية).
   mapCoords: { lat: 31.1085659, lng: 31.7548881 },
