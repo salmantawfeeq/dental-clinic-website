@@ -23,8 +23,9 @@ export const clinicInfo = {
   hours: "يوميًا (السبت–الجمعة) من 4 عصرًا حتى 11 مساءً",
   address: "منشأة عبد الرحمن - دكرنس - الدقهلية",
   facebookUrl: "https://www.facebook.com/share/1CFK58r1kW/?mibextid=wwXIfr",
-  // من لينك خرائط جوجل اللي بعته الدكتور (محافظة الدقهلية).
-  mapCoords: { lat: 31.1085659, lng: 31.7548881 },
-  mapDirectionsUrl: "https://www.google.com/maps?q=31.1085659,31.7548881",
-  mapEmbedUrl: "https://www.google.com/maps?q=31.1085659,31.7548881&output=embed",
+  // بند (2026-10-01): إحداثيات دقيقة من لينك جوجل ماب لصفحة العيادة الموثّقة نفسها على خرائط جوجل
+  // (اللي بعتها الدكتور صراحة كـ"لوكيشن العيادة بالظبط") — مش تقدير عام للمنطقة زي قبل كده.
+  mapCoords: { lat: 31.1085615, lng: 31.754919 },
+  mapDirectionsUrl: "https://www.google.com/maps?q=31.1085615,31.754919",
+  mapEmbedUrl: "https://www.google.com/maps?q=31.1085615,31.754919&output=embed",
 };
