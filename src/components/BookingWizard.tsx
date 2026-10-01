@@ -101,7 +101,7 @@ export function BookingWizard() {
   // ونشر يدوي. بنجيبها هنا في المتصفح نفسه (كل ما حد يفتح صفحة الحجز) عشان تبقى فعليًا فورية.
   //
   // بند: ده بيغطي "أول فتح للصفحة" بس — لو حد فاتح الصفحة بالفعل وقاعد فيها والتعديل حصل وهو لسه قاعد،
-  // مش هيشوفه غير لو عمل Refresh. بنعيد الجلب كل 30 ثانية في الخلفية (من غير ما نرجّع شاشة "بنجيب
+  // مش هيشوفه غير لو عمل Refresh. بنعيد الجلب كل 10 ثواني في الخلفية (من غير ما نرجّع شاشة "بنجيب
   // الخدمات..." تاني) عشان حتى اللي قاعد فاتح الصفحة ياخد أي تحديث من غير ما يحتاج يعمل حاجة.
   useEffect(() => {
     let cancelled = false;
@@ -121,7 +121,7 @@ export function BookingWizard() {
       }
     }
     void loadServices(true);
-    const intervalId = window.setInterval(() => void loadServices(false), 30_000);
+    const intervalId = window.setInterval(() => void loadServices(false), 10_000);
     return () => {
       cancelled = true;
       window.clearInterval(intervalId);
