@@ -99,9 +99,13 @@ export function BookingWizard() {
   // بند: الموقع Static (مبني مرة واحدة وقت الـdeploy، مش سيرفر شغال)، فلو قائمة الخدمات كانت بتتجاب وقت
   // البناء بس، أي خدمة جديدة أو تعطيل خدمة في برنامج العيادة كان مش هيبان على الموقع إلا بعد إعادة بناء
   // ونشر يدوي. بنجيبها هنا في المتصفح نفسه (كل ما حد يفتح صفحة الحجز) عشان تبقى فعليًا فورية.
+  //
+  // بند: ده بيغطي "أول فتح للصفحة" بس — لو حد فاتح الصفحة بالفعل وقاعد فيها والتعديل حصل وهو لسه قاعد،
+  // مش هيشوفه غير لو عمل Refresh. بنعيد الجلب كل 30 ثانية في الخلفية (من غير ما نرجّع شاشة "بنجيب
+  // الخدمات..." تاني) عشان حتى اللي قاعد فاتح الصفحة ياخد أي تحديث من غير ما يحتاج يعمل حاجة.
   useEffect(() => {
     let cancelled = false;
-    async function loadServices() {
+    async function loadServices(isFirstLoad: boolean) {
       try {
         const supabase = getSupabasePublic();
         const { data } = await supabase
@@ -111,14 +115,16 @@ export function BookingWizard() {
           .order("display_order", { ascending: true });
         if (!cancelled) setServices((data ?? []) as Service[]);
       } catch {
-        if (!cancelled) setServices([]);
+        if (!cancelled && isFirstLoad) setServices([]);
       } finally {
-        if (!cancelled) setServicesLoading(false);
+        if (!cancelled && isFirstLoad) setServicesLoading(false);
       }
     }
-    void loadServices();
+    void loadServices(true);
+    const intervalId = window.setInterval(() => void loadServices(false), 30_000);
     return () => {
       cancelled = true;
+      window.clearInterval(intervalId);
     };
   }, []);
 
