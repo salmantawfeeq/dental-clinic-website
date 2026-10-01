@@ -1,28 +1,11 @@
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { BookingWizard } from "@/components/BookingWizard";
-import { getSupabasePublic } from "@/lib/supabasePublic";
 
-type ServiceRow = { id: string; name: string; duration_min_minutes: number; duration_max_minutes: number };
-
-async function getServices(): Promise<ServiceRow[]> {
-  try {
-    const supabase = getSupabasePublic();
-    const { data } = await supabase
-      .from("services")
-      .select("id, name, duration_min_minutes, duration_max_minutes")
-      .eq("is_active", true)
-      .order("display_order", { ascending: true });
-    return (data ?? []) as ServiceRow[];
-  } catch {
-    // Supabase لسه مش متظبط (بند Phase 6) — الصفحة تفضل تشتغل، الحجز نفسه هيفشل لحد ما يتظبط.
-    return [];
-  }
-}
-
-export default async function BookPage() {
-  const services = await getServices();
-
+// بند: الموقع Static، فجلب الخدمات وقت البناء هنا كان معناه قائمة الحجز بتفضل منسوخة لحظة آخر نشر —
+// أي خدمة جديدة أو تعطيل خدمة في برنامج العيادة ميبانش غير بعد إعادة نشر يدوي. BookingWizard دلوقتي
+// بيجيب الخدمات بنفسه من المتصفح (راجع تعليقه)، فمفيش داعي لجلبها هنا خالص.
+export default function BookPage() {
   return (
     <>
       <SiteHeader />
@@ -34,7 +17,7 @@ export default async function BookPage() {
         <p style={{ color: "var(--color-ink-soft)", marginTop: 0, marginBottom: 36, fontSize: "1.02rem" }}>
           الحجز مجاني وبيتأكد فورًا — من غير ما تحتاج تدفع أو تستنى موافقة.
         </p>
-        <BookingWizard services={services} />
+        <BookingWizard />
       </div>
       <SiteFooter />
     </>
