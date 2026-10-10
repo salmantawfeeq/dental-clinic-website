@@ -57,7 +57,9 @@ async function fetchSlotsForDay(date: string, serviceId: string): Promise<Slot[]
   const slots: Slot[] = [];
   const totalMinutesInDay = (CLINIC_CLOSE_HOUR - CLINIC_OPEN_HOUR) * 60;
 
-  for (let offset = 0; offset < totalMinutesInDay; offset += SLOT_STEP_MINUTES) {
+  // بند: آخر معاد قابل للحجز لازم يكون ساعة قفل العيادة نفسها (11:00 م) — لو الشرط كان "<" بس، آخر معاد
+  // فعلي كان بيقف عند آخر خانة قبلها بخطوة (10:40 لو الخطوة 20 دقيقة)، مش الساعة المعلنة فعليًا.
+  for (let offset = 0; offset <= totalMinutesInDay; offset += SLOT_STEP_MINUTES) {
     const hour = CLINIC_OPEN_HOUR + Math.floor(offset / 60);
     const minute = offset % 60;
     const scheduledAt = new Date(buildCairoISOString(year, month, day, hour, minute));
