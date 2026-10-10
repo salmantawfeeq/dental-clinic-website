@@ -7,6 +7,15 @@ import { asset } from "@/lib/basePath";
 import { IconTooth, IconShield, IconSparkle, IconClock, IconGraduationCap, IconQuote } from "@/components/icons";
 import { testimonials } from "@/lib/testimonials";
 
+// بند: قسم "عن العيادة" محتاج خلفية تدّي شكل أغنى بدل الخلفية المسطّحة الفاضية — صورة غرفة علاج (مرخّصة
+// استخدام تجاري مجاني، Unsplash License) معتّمة بتدرّج من لون خلفية الموقع نفسه عشان النص يفضل واضح 100%.
+const aboutSectionBackgroundStyle = {
+  backgroundColor: "var(--color-bg-soft)",
+  backgroundImage: `linear-gradient(135deg, rgba(248,250,252,0.55) 0%, rgba(240,253,250,0.45) 100%), url("${asset("about-bg.jpg")}")`,
+  backgroundSize: "cover",
+  backgroundPosition: "center",
+};
+
 const stats = [
   { number: `${displayServices.length}+`, label: "خدمة متخصصة تحت سقف واحد" },
   { number: "24/7", label: "الحجز الأونلاين متاح في أي وقت" },
@@ -118,7 +127,7 @@ export default function HomePage() {
       </section>
 
       {/* About the clinic */}
-      <section className="section" style={{ paddingTop: 0, background: "var(--color-bg-soft)" }}>
+      <section className="section" style={{ paddingTop: 0, ...aboutSectionBackgroundStyle }}>
         <div className="container">
           <div className="section-head">
             <span className="eyebrow">عن العيادة</span>
@@ -240,8 +249,8 @@ export default function HomePage() {
       <section className="section" style={{ background: "var(--color-bg-soft)" }}>
         <div className="container">
           <div className="section-head">
-            <span className="eyebrow">آراء مرضانا</span>
-            <h2 className="section-title">كلام حقيقي من مرضى حقيقيين</h2>
+            <span className="eyebrow">قصص نجاح</span>
+            <h2 className="section-title">ثقة مرضانا تتحدث</h2>
           </div>
           <div className="grid-auto">
             {testimonials.map((t, i) => (
