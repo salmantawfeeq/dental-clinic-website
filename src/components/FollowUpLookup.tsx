@@ -96,7 +96,6 @@ export function FollowUpLookup() {
             value={identifier}
             onChange={(e) => setIdentifier(e.target.value)}
             style={inputStyle}
-            placeholder="مثال: أحمد محمد علي — أو كود الحجز"
           />
         </label>
         <button className="btn btn-primary" type="submit" disabled={loading}>
