@@ -13,7 +13,10 @@ const description = `احجز موعدك في ${clinicInfo.name} أونلاين 
 
 // SITE_URL بيمثّل جذر الموقع الحقيقي اللي الملفات بتتقدّم منه (الدومين + المسار الفرعي لو موجود)،
 // فمفيش داعي لـasset()/basePath هنا تاني — ده كان بيسبب تكرار المسار الفرعي مرتين في الرابط.
-const ogImageUrl = `${SITE_URL}/hero-clinic.jpg`;
+// بند: صورة الكارت اللي بتظهر لما الرابط يتبعت في واتساب/فيسبوك — صورة الدكتور نفسه (مربّعة 1254×1254)
+// بدل صورة غرفة الكشف، عشان الكارت يبقى شخصي وموثوق أكتر وقت إرساله. الأبعاد هنا مطابقة لأبعاد الملف
+// الحقيقي بالظبط (مش 1200×630 المعتادة) عشان منمنعش أي تشويه/قص غريب على المنصات اللي بتحترم الأبعاد المُعلنة.
+const ogImageUrl = `${SITE_URL}/doctor-photo.jpg`;
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -31,6 +34,15 @@ export const metadata: Metadata = {
     "زراعة أسنان",
     "تقويم أسنان",
     "علاج عصب",
+    // بند: كلمات إنجليزية — عشان أي بحث بالإنجليزي (دكتور أسنان أجنبي أو مقيم في المنطقة مثلًا) كمان
+    // يلاقي الموقع، من غير ما نترجم الموقع نفسه بالكامل (قرار الدكتور: عربي بس حاليًا).
+    "dentist",
+    "dental clinic",
+    "dental clinic Dakernes",
+    "dental clinic Dakahlia Egypt",
+    "Ahmed El-Husseiny dentist",
+    "Dr Ahmed El-Husseiny",
+    "online dental appointment Egypt",
     clinicInfo.name,
     clinicInfo.doctorName,
   ],
@@ -45,7 +57,7 @@ export const metadata: Metadata = {
     siteName: clinicInfo.name,
     title: clinicInfo.name,
     description,
-    images: [{ url: ogImageUrl, width: 1200, height: 630, alt: clinicInfo.name }],
+    images: [{ url: ogImageUrl, width: 1254, height: 1254, alt: clinicInfo.doctorName }],
   },
   twitter: {
     card: "summary_large_image",
