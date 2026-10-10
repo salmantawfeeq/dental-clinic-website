@@ -137,6 +137,9 @@ export function SiteFooter() {
           <Link href="/book" style={{ color: "rgba(255,255,255,0.75)", fontSize: "0.9rem" }}>
             احجز موعدك
           </Link>
+          <Link href="/follow-up" style={{ color: "rgba(255,255,255,0.75)", fontSize: "0.9rem" }}>
+            متابعة الموعد
+          </Link>
         </div>
       </div>
 
