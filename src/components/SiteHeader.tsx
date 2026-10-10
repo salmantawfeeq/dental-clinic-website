@@ -9,6 +9,7 @@ const navItems = [
   { href: "/", label: "الرئيسية" },
   { href: "/about", label: "عن الدكتور" },
   { href: "/services", label: "الخدمات" },
+  { href: "/follow-up", label: "متابعة الموعد" },
   { href: "/contact", label: "تواصل معنا" },
 ];
 
