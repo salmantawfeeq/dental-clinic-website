@@ -74,3 +74,44 @@ create policy "anon can insert pending bookings" on public.online_bookings
   with check (status = 'pending_sync');
 
 grant select on public.public_busy_online_slots to anon;
+
+-- بند: "متابعة الموعد" — المريض بيدخل برقم تليفونه + (اسمه أو كود الحجز) ويشوف معاده، ولو داخل العيادة
+-- فعليًا النهاردة يشوف كمان "قدامه كام واحد" في الطابور. الجدول ده مفيهوش أي بيانات طبية أو مالية —
+-- بس الاسم/التليفون (لازمين للمطابقة) والتاريخ وحالة الطابور، زي باقي الجداول هنا بالظبط.
+-- بيتبنى بالكامل من الصفر كل دورة مزامنة (local-server، كل 15 ثانية تقريبًا) — راجع syncService.ts.
+create table if not exists public.appointment_status (
+  booking_code text primary key,
+  patient_full_name text not null,
+  patient_phone text not null,
+  scheduled_at timestamptz not null,
+  checked_in boolean not null default false,
+  queue_ahead_count int
+);
+
+alter table public.appointment_status enable row level security;
+
+-- مفيش أي policy بتسمح بقراءة الجدول ده مباشرة لـanon عمدًا (ده فيه اسم وتليفون حقيقي) — القراءة
+-- بس عن طريق الدالة تحت، اللي بترجّع صف واحد بس لو الاتنين (التليفون + الاسم أو الكود) متطابقين صحيح.
+create or replace function public.lookup_appointment_status(p_phone text, p_identifier text)
+returns table (
+  scheduled_at timestamptz,
+  checked_in boolean,
+  queue_ahead_count int
+)
+language sql
+security definer
+set search_path = public
+as $$
+  select scheduled_at, checked_in, queue_ahead_count
+  from public.appointment_status
+  where patient_phone = trim(p_phone)
+    and (
+      booking_code = trim(p_identifier)
+      or lower(regexp_replace(patient_full_name, '\s+', ' ', 'g')) = lower(regexp_replace(trim(p_identifier), '\s+', ' ', 'g'))
+    )
+  order by scheduled_at asc
+  limit 1;
+$$;
+
+revoke all on function public.lookup_appointment_status(text, text) from public;
+grant execute on function public.lookup_appointment_status(text, text) to anon;
