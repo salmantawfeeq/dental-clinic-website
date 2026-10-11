@@ -5,6 +5,7 @@ import { SiteFooter } from "@/components/SiteFooter";
 import { displayServices } from "@/lib/services";
 import { clinicInfo } from "@/lib/clinicInfo";
 import { IconTooth } from "@/components/icons";
+import { asset } from "@/lib/basePath";
 
 export const metadata: Metadata = {
   title: "الخدمات",
@@ -12,12 +13,20 @@ export const metadata: Metadata = {
   alternates: { canonical: "/services/" },
 };
 
+// بند: نفس خلفية قسم "خدماتنا" في الصفحة الرئيسية، عشان الشكل يبقى متسق بين الاتنين.
+const servicesPageBackgroundStyle = {
+  backgroundColor: "var(--color-bg)",
+  backgroundImage: `linear-gradient(135deg, rgba(255,255,255,0.55) 0%, rgba(240,253,250,0.45) 100%), url("${asset("services-bg.jpg")}")`,
+  backgroundSize: "cover",
+  backgroundPosition: "center 40%",
+};
+
 export default function ServicesPage() {
   return (
     <>
       <SiteHeader />
 
-      <section className="section" style={{ paddingTop: 56 }}>
+      <section className="section" style={{ paddingTop: 56, ...servicesPageBackgroundStyle }}>
         <div className="container">
           <div className="section-head">
             <span className="eyebrow">خدماتنا</span>
