@@ -87,7 +87,6 @@ export function FollowUpLookup() {
             onChange={(e) => setPhone(e.target.value)}
             style={inputStyle}
             inputMode="numeric"
-            placeholder="01xxxxxxxxx"
           />
         </label>
         <label style={{ display: "grid", gap: 6 }}>
