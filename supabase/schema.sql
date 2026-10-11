@@ -125,3 +125,77 @@ $$;
 
 revoke all on function public.lookup_appointment_status(text, text) from public;
 grant execute on function public.lookup_appointment_status(text, text) to anon;
+
+-- بند (2026-10-11): لو lookup_appointment_status مرجعتش حاجة، مش معناه إن الحجز "مش موجود خالص" من وجهة
+-- نظر المريض — ممكن يكون وصل فعلاً بس لسه قيد المزامنة، أو اتقفل للمراجعة اليدوية (مثلاً تطابق اسم بس
+-- مش رقم تليفون على ملف موجود، راجع name_phone_mismatch في syncService.ts) بدل ما يتربط غلط بملف حد
+-- تاني. من غير الدالة دي، صفحة المتابعة كانت بتقول "مفيش حجز" بشكل مضلل تمامًا — حجزك فعلاً موجود، بس
+-- محتاج وقت أو مراجعة. بترجّع الحالة بس (مفيش اسم/تليفون هنا أصلاً)، عشان الواجهة تعرف توضح للمريض.
+create or replace function public.lookup_online_booking_status(p_phone text, p_identifier text)
+returns table (
+  status text,
+  sync_error text
+)
+language sql
+security definer
+set search_path = public
+as $$
+  select status, sync_error
+  from public.online_bookings
+  where patient_phone = trim(p_phone)
+    and (
+      booking_code = trim(p_identifier)
+      or lower(regexp_replace(patient_full_name, '\s+', ' ', 'g')) = lower(regexp_replace(trim(p_identifier), '\s+', ' ', 'g'))
+    )
+  order by created_at desc
+  limit 1;
+$$;
+
+revoke all on function public.lookup_online_booking_status(text, text) from public;
+grant execute on function public.lookup_online_booking_status(text, text) to anon;
+
+-- بند (2026-10-11): فهرس أسماء المرضى الحاليين — آخر 3 أرقام من التليفون بس، ومفيش أي بيانات تانية
+-- (لا رقم كامل، لا تاريخ ميلاد، لا أي حاجة طبية) — عشان الموقع يقدر يرفض حجز بنفس اسم مريض موجود
+-- برقم مختلف فورًا وقت الحجز نفسه، ويوضح للمريض اللي بيحجز (مش للسكرتيرة — معندهاش صلاحية تعديل ملف
+-- مريض أصلاً، فإشعارها بالموضوع مفيدش). بيتبنى بالكامل من الصفر كل دورة مزامنة، زي appointment_status
+-- بالظبط — راجع syncService.ts.
+create table if not exists public.patient_name_index (
+  normalized_full_name text primary key,
+  phone_last3 text not null
+);
+
+alter table public.patient_name_index enable row level security;
+
+-- مفيش قراءة مباشرة لـanon عمدًا — بس عن طريق الدالة تحت، اللي بتاخد اسم وترجع آخر 3 أرقام بس لو فيه تطابق.
+create or replace function public.check_patient_name_conflict(p_full_name text)
+returns table (phone_last3 text)
+language sql
+security definer
+set search_path = public
+as $$
+  select phone_last3
+  from public.patient_name_index
+  where normalized_full_name = lower(regexp_replace(trim(p_full_name), '\s+', ' ', 'g'))
+  limit 1;
+$$;
+
+revoke all on function public.check_patient_name_conflict(text) from public;
+grant execute on function public.check_patient_name_conflict(text) to anon;
+
+-- بند (طلب الدكتور 2026-10-11): مرجع واحد بس للوقت الصحيح — ساعة جهاز العيادة نفسه (اللي السكرتيرة
+-- والدكتور شايفينه قدامهم فعليًا)، مش حساب توقيت صيفي مستقل في كود الموقع. local-server بيبعت الإزاحة
+-- الحالية من ساعة الجهاز نفسها كل دورة مزامنة (pushClinicTimeOffset في syncService.ts)، والموقع بيقراها
+-- بدل أي حساب تاني. صف واحد بس دايمًا (id boolean + check عليه)، ومفيهوش أي بيانات حساسة خالص —
+-- قراءة عامة آمنة تمامًا.
+create table if not exists public.clinic_time_offset (
+  id boolean primary key default true,
+  utc_offset text not null,
+  updated_at timestamptz not null default now(),
+  constraint clinic_time_offset_single_row check (id)
+);
+
+alter table public.clinic_time_offset enable row level security;
+
+create policy "anon can read clinic time offset" on public.clinic_time_offset
+  for select to anon
+  using (true);
