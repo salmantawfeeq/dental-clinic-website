@@ -4,7 +4,15 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { getSupabasePublic } from "@/lib/supabasePublic";
 import { generateBookingCode } from "@/lib/bookingCode";
-import { buildCairoISOString, nowInCairo, formatTime12h, CLINIC_OPEN_HOUR, CLINIC_CLOSE_HOUR, SLOT_STEP_MINUTES } from "@/lib/clinicHours";
+import {
+  buildCairoISOString,
+  nowInCairo,
+  formatTime12h,
+  loadClinicTimeOffset,
+  CLINIC_OPEN_HOUR,
+  CLINIC_CLOSE_HOUR,
+  SLOT_STEP_MINUTES,
+} from "@/lib/clinicHours";
 
 interface Service {
   id: string;
@@ -107,6 +115,12 @@ export function BookingWizard() {
   // بند: ده بيغطي "أول فتح للصفحة" بس — لو حد فاتح الصفحة بالفعل وقاعد فيها والتعديل حصل وهو لسه قاعد،
   // مش هيشوفه غير لو عمل Refresh. بنعيد الجلب كل 10 ثواني في الخلفية (من غير ما نرجّع شاشة "بنجيب
   // الخدمات..." تاني) عشان حتى اللي قاعد فاتح الصفحة ياخد أي تحديث من غير ما يحتاج يعمل حاجة.
+  // بند: بنحمّل إزاحة توقيت جهاز العيادة أول ما الصفحة تفتح — راجع تعليق loadClinicTimeOffset في
+  // clinicHours.ts للتفصيل الكامل (مرجع واحد بس للوقت الصحيح، من ساعة الجهاز نفسه).
+  useEffect(() => {
+    void loadClinicTimeOffset();
+  }, []);
+
   useEffect(() => {
     let cancelled = false;
     async function loadServices(isFirstLoad: boolean) {
@@ -212,6 +226,22 @@ export function BookingWizard() {
     setSubmitting(true);
     try {
       const supabase = getSupabasePublic();
+
+      // بند (2026-10-11): قبل أي حاجة تانية، نتأكد إن الاسم ده مش عندو ملف موجود فعلاً برقم تليفون مختلف —
+      // لو حصل كده ومش رفضناه هنا، الحجز كان هيتقفل لاحقًا وقت المزامنة من غير ما حد (لا المريض ولا
+      // العيادة) يعرف أي حاجة حصلت. السكرتيرة أصلاً معندهاش صلاحية تعديل ملف مريض، فإشعارها بالموضوع
+      // مفيدش — الرفض والتوضيح لازم يحصلوا هنا فورًا للمريض نفسه.
+      const { data: nameConflict } = await supabase.rpc("check_patient_name_conflict", {
+        p_full_name: normalizedName,
+      });
+      const conflictRow = Array.isArray(nameConflict) && nameConflict.length > 0 ? nameConflict[0] : null;
+      if (conflictRow && !phone.trim().endsWith(conflictRow.phone_last3 as string)) {
+        setErrorMessage(
+          `في ملف مسجل عندنا بنفس الاسم برقم ينتهي بـ ${conflictRow.phone_last3} — لو ده مش رقمك، ` +
+            `برجاء الاتصال بالعيادة مباشرة لتأكيد بياناتك قبل الحجز.`
+        );
+        return;
+      }
 
       // فحص التعارض لحظة التأكيد نفسها — بيمنع إن اثنين يحجزوا نفس المعاد بالضبط لو ضغطوا في نفس الثانية تقريبًا.
       const [busyCheck, onlineCheck] = await Promise.all([

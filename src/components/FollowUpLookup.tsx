@@ -9,6 +9,23 @@ interface AppointmentStatusResult {
   queue_ahead_count: number | null;
 }
 
+interface OnlineBookingStatusResult {
+  status: string;
+  sync_error: string | null;
+}
+
+// بند: لو الحجز لسه قيد المزامنة أو اتقفل لمراجعة يدوية، الحجز "موجود فعلاً" من وجهة نظر المريض —
+// مش "مش موجود خالص". راجع تعليق lookup_online_booking_status في schema.sql للتفصيل الكامل.
+function pendingBookingMessage(booking: OnlineBookingStatusResult): string {
+  if (booking.status !== "failed") {
+    return "📥 حجزك وصل لينا وجاري تأكيده حاليًا — جرب تاني بعد شوية.";
+  }
+  if (booking.sync_error === "name_phone_mismatch") {
+    return "⚠️ حجزك محتاج مراجعة من العيادة قبل التأكيد — برجاء الاتصال بالعيادة مباشرة.";
+  }
+  return "⚠️ حصلت مشكلة في تأكيد حجزك — برجاء الاتصال بالعيادة مباشرة.";
+}
+
 const inputStyle: React.CSSProperties = {
   padding: "12px 14px",
   borderRadius: 10,
@@ -22,7 +39,20 @@ const inputStyle: React.CSSProperties = {
 // الرقم الحقيقي (قدامك كام واحد) بييجي من السيرفر مباشرة.
 function formatTimeRemaining(scheduledAt: string): string {
   const diffMs = new Date(scheduledAt).getTime() - Date.now();
-  if (diffMs <= 0) return "معادك دلوقتي تقريبًا";
+
+  // بند (باگ حقيقي اكتُشف 2026-10-11): كان الشرط هنا diffMs <= 0 بس — يعني معاد فات من 10 دقايق ومعاد
+  // فات من 6 ساعات كانوا بيطلعوا بنفس الرسالة بالظبط "معادك دلوقتي تقريبًا"، وده مضلل تمامًا لمعاد فات
+  // من زمان. ساعة كاملة هامش معقول (ممكن المريض وصل ولسه السكرتيرة مسجلتش حضوره على النظام)، وبعدها
+  // بنوضح إنه فات فعلاً، بنفس صيغة "باقي قد إيه" لكن بالعكس.
+  if (diffMs <= 0) {
+    const pastMinutes = Math.round(-diffMs / 60000);
+    if (pastMinutes <= 60) return "معادك دلوقتي تقريبًا";
+    const pastHours = Math.round(pastMinutes / 60);
+    if (pastHours < 24) return `معادك ده فات من حوالي ${pastHours} ساعة`;
+    const pastDays = Math.round(pastHours / 24);
+    return `معادك ده فات من حوالي ${pastDays} يوم`;
+  }
+
   const minutes = Math.round(diffMs / 60000);
   if (minutes < 60) return `باقي حوالي ${minutes} دقيقة`;
   const hours = Math.round(minutes / 60);
@@ -47,6 +77,7 @@ export function FollowUpLookup() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<AppointmentStatusResult | null>(null);
+  const [pendingBooking, setPendingBooking] = useState<OnlineBookingStatusResult | null>(null);
   const [searched, setSearched] = useState(false);
 
   async function handleSubmit(event: React.FormEvent) {
@@ -59,16 +90,31 @@ export function FollowUpLookup() {
     setLoading(true);
     setError(null);
     setResult(null);
+    setPendingBooking(null);
     setSearched(false);
 
     try {
-      const { data, error: rpcError } = await getSupabasePublic().rpc("lookup_appointment_status", {
+      const supabase = getSupabasePublic();
+      const { data, error: rpcError } = await supabase.rpc("lookup_appointment_status", {
         p_phone: phone.trim(),
         p_identifier: identifier.trim(),
       });
 
       if (rpcError) throw rpcError;
-      setResult(Array.isArray(data) && data.length > 0 ? (data[0] as AppointmentStatusResult) : null);
+      const found = Array.isArray(data) && data.length > 0 ? (data[0] as AppointmentStatusResult) : null;
+      setResult(found);
+
+      // مفيش موعد مؤكد — قبل ما نقول "مفيش حجز خالص"، نتأكد إنه مش لسه قيد المزامنة أو قفل لمراجعة يدوية.
+      if (!found) {
+        const { data: bookingData } = await supabase.rpc("lookup_online_booking_status", {
+          p_phone: phone.trim(),
+          p_identifier: identifier.trim(),
+        });
+        const pending =
+          Array.isArray(bookingData) && bookingData.length > 0 ? (bookingData[0] as OnlineBookingStatusResult) : null;
+        setPendingBooking(pending);
+      }
+
       setSearched(true);
     } catch {
       setError("حصل خطأ أثناء البحث — حاول تاني بعد شوية.");
@@ -104,7 +150,11 @@ export function FollowUpLookup() {
 
       {error && <p style={{ color: "var(--color-danger, #c0392b)", marginTop: 16 }}>{error}</p>}
 
-      {searched && !error && !result && (
+      {searched && !error && !result && pendingBooking && (
+        <p style={{ marginTop: 16 }}>{pendingBookingMessage(pendingBooking)}</p>
+      )}
+
+      {searched && !error && !result && !pendingBooking && (
         <p style={{ marginTop: 16 }}>لم يتم العثور على حجز بهذه البيانات — تأكد من رقم التليفون والاسم/الكود.</p>
       )}
 
