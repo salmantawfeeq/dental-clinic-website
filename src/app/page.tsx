@@ -71,8 +71,7 @@ export default function HomePage() {
         />
         <div className="container hero-grid">
           <div>
-            <span className="eyebrow">{clinicInfo.doctorTitle}</span>
-            <h1 style={{ fontSize: "clamp(2rem, 4.2vw, 3.1rem)", fontWeight: 800, lineHeight: 1.25, margin: "18px 0 0", letterSpacing: "-0.02em" }}>
+            <h1 style={{ fontSize: "clamp(2rem, 4.2vw, 3.1rem)", fontWeight: 800, lineHeight: 1.25, margin: 0, letterSpacing: "-0.02em" }}>
               ابتسامتك تستاهل عناية حقيقية
             </h1>
             <p style={{ fontSize: "1.15rem", color: "var(--color-ink-soft)", marginTop: 18, maxWidth: 480 }}>
