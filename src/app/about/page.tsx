@@ -35,7 +35,7 @@ export default function AboutPage() {
               maxWidth: 360,
             }}
           >
-            <img src={asset("doctor-photo.jpg")} alt={clinicInfo.doctorName} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+            <img src={asset("doctor-photo-about.jpg")} alt={clinicInfo.doctorName} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
           </div>
 
           <div>
