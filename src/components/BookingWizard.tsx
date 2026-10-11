@@ -341,12 +341,12 @@ export function BookingWizard() {
 
       {step === 1 && (
         <div style={{ marginTop: 20 }}>
-          <div style={{ display: "flex", gap: 8, overflowX: "auto", paddingBottom: 8 }}>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(130px, 1fr))", gap: 10 }}>
             {days.map((d) => (
               <button
                 key={d.value}
                 className={d.value === date ? "btn btn-primary" : "btn btn-outline"}
-                style={{ flexShrink: 0, padding: "10px 16px", fontSize: "0.85rem" }}
+                style={{ padding: "10px 12px", fontSize: "0.85rem" }}
                 onClick={() => setDate(d.value)}
               >
                 {d.label}
