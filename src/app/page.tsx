@@ -4,7 +4,7 @@ import { SiteFooter } from "@/components/SiteFooter";
 import { clinicInfo } from "@/lib/clinicInfo";
 import { displayServices } from "@/lib/services";
 import { asset } from "@/lib/basePath";
-import { IconTooth, IconShield, IconSparkle, IconClock, IconGraduationCap, IconQuote } from "@/components/icons";
+import { IconTooth, IconShield, IconClock, IconGraduationCap, IconQuote } from "@/components/icons";
 import { testimonials } from "@/lib/testimonials";
 
 // بند: قسم "عن العيادة" محتاج خلفية تدّي شكل أغنى بدل الخلفية المسطّحة الفاضية — صورة غرفة علاج (مرخّصة
@@ -14,6 +14,16 @@ const aboutSectionBackgroundStyle = {
   backgroundImage: `linear-gradient(135deg, rgba(248,250,252,0.55) 0%, rgba(240,253,250,0.45) 100%), url("${asset("about-bg.jpg")}")`,
   backgroundSize: "cover",
   backgroundPosition: "center",
+};
+
+// بند: نفس فكرة خلفية "عن العيادة" فوق، لقسم "خدماتنا" — صورة ابتسامة مرخّصة استخدام تجاري مجاني
+// (Unsplash License). الصورة أصلها طولية (بورتريه)، فـ"cover" هنا بيقص الجوانب مش فوق/تحت — ومركز
+// الالتقاط مظبوط عشان الابتسامة نفسها تبان بوضوح (مش الشعر أو الجبهة بس).
+const servicesSectionBackgroundStyle = {
+  backgroundColor: "var(--color-bg)",
+  backgroundImage: `linear-gradient(135deg, rgba(255,255,255,0.55) 0%, rgba(240,253,250,0.45) 100%), url("${asset("services-bg.jpg")}")`,
+  backgroundSize: "cover",
+  backgroundPosition: "center 40%",
 };
 
 const stats = [
@@ -61,9 +71,7 @@ export default function HomePage() {
         />
         <div className="container hero-grid">
           <div>
-            <span className="eyebrow">
-              <IconSparkle size={16} /> {clinicInfo.doctorTitle}
-            </span>
+            <span className="eyebrow">{clinicInfo.doctorTitle}</span>
             <h1 style={{ fontSize: "clamp(2rem, 4.2vw, 3.1rem)", fontWeight: 800, lineHeight: 1.25, margin: "18px 0 0", letterSpacing: "-0.02em" }}>
               ابتسامتك تستاهل عناية حقيقية
             </h1>
@@ -189,7 +197,7 @@ export default function HomePage() {
       </section>
 
       {/* Services preview */}
-      <section className="section">
+      <section className="section" style={servicesSectionBackgroundStyle}>
         <div className="container">
           <div className="section-head">
             <span className="eyebrow">خدماتنا</span>
