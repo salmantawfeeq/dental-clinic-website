@@ -1,7 +1,9 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import Link from "next/link";
 import { getSupabasePublic } from "@/lib/supabasePublic";
+import { generateBookingCode } from "@/lib/bookingCode";
 import { buildCairoISOString, nowInCairo, formatTime12h, CLINIC_OPEN_HOUR, CLINIC_CLOSE_HOUR, SLOT_STEP_MINUTES } from "@/lib/clinicHours";
 
 interface Service {
@@ -92,7 +94,7 @@ export function BookingWizard() {
   const [dobYear, setDobYear] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [confirmed, setConfirmed] = useState<{ time: string; date: string } | null>(null);
+  const [confirmed, setConfirmed] = useState<{ time: string; date: string; bookingCode: string } | null>(null);
 
   const days = useMemo(() => nextDays(14), []);
   const selectedService = services.find((s) => s.id === serviceId) ?? null;
@@ -223,17 +225,30 @@ export function BookingWizard() {
         return;
       }
 
-      const { error: insertError } = await supabase.from("online_bookings").insert({
-        service_id: serviceId,
-        scheduled_at: scheduledAt,
-        patient_full_name: normalizedName,
-        patient_phone: phone.trim(),
-        patient_date_of_birth: dateOfBirth,
-        status: "pending_sync",
-      });
+      // كود الحجز بيتولّد هنا وبيتحط في الصف من الأول — عشان المريض يشوفه فورًا في شاشة التأكيد
+      // (راجع تعليق bookingCode في schema.sql)، مش لازم يستنى دورة المزامنة زي الأول.
+      let bookingCode = generateBookingCode();
+      let insertError: { code?: string; message?: string } | null = null;
+      for (let attempt = 0; attempt < 5; attempt++) {
+        const result = await supabase.from("online_bookings").insert({
+          service_id: serviceId,
+          scheduled_at: scheduledAt,
+          patient_full_name: normalizedName,
+          patient_phone: phone.trim(),
+          patient_date_of_birth: dateOfBirth,
+          status: "pending_sync",
+          booking_code: bookingCode,
+        });
+        insertError = result.error;
+        if (!insertError) break;
+        // كود 23505 ممكن يكون تصادم الموعد (online_bookings_active_slot_idx) أو تصادم كود الحجز نفسه
+        // (online_bookings_booking_code_idx، فرصته شبه مستحيلة) — لو كود الحجز هو اللي اتصادم بس، نولّد
+        // كود جديد ونعيد المحاولة من غير ما نضيّع حجز المريض؛ أي تصادم تاني بيوقف المحاولات على طول.
+        if (insertError.code !== "23505" || !insertError.message?.includes("booking_code")) break;
+        bookingCode = generateBookingCode();
+      }
 
       if (insertError) {
-        // كود 23505 = Unique violation على online_bookings_active_slot_idx (schema.sql) — سباق نادر.
         if (insertError.code === "23505") {
           setErrorMessage("للأسف الموعد ده اتحجز لحظة ما كنت بتأكد — اختار وقت تاني من فضلك");
           setStep(1);
@@ -245,7 +260,7 @@ export function BookingWizard() {
 
       const selectedSlot = slots.find((s) => s.scheduledAt === scheduledAt);
       const selectedDay = days.find((d) => d.value === date);
-      setConfirmed({ time: selectedSlot?.time ?? "", date: selectedDay?.label ?? "" });
+      setConfirmed({ time: selectedSlot?.time ?? "", date: selectedDay?.label ?? "", bookingCode });
     } catch {
       setErrorMessage("حصل خطأ في الاتصال، حاول تاني");
     } finally {
@@ -261,7 +276,35 @@ export function BookingWizard() {
         <p style={{ color: "var(--color-ink-soft)" }}>
           {selectedService?.name} — {confirmed.date} الساعة {confirmed.time}
         </p>
-        <p style={{ color: "var(--color-ink-soft)", fontSize: "0.9rem" }}>تقدر تتأخر أو تلغي عن طريق الاتصال بالعيادة.</p>
+        <div
+          style={{
+            marginTop: 20,
+            padding: "14px 20px",
+            borderRadius: 12,
+            background: "var(--color-primary-tint)",
+            display: "inline-block",
+          }}
+        >
+          <p style={{ margin: 0, fontSize: "0.85rem", color: "var(--color-ink-soft)" }}>كود الحجز — احتفظ به للمتابعة</p>
+          <p
+            style={{
+              margin: "4px 0 0",
+              fontSize: "1.6rem",
+              fontWeight: 800,
+              letterSpacing: "0.04em",
+              color: "var(--color-primary-dark)",
+            }}
+          >
+            {confirmed.bookingCode}
+          </p>
+        </div>
+        <p style={{ color: "var(--color-ink-soft)", fontSize: "0.9rem", marginTop: 20 }}>
+          تقدر تتابع معادك في أي وقت من صفحة{" "}
+          <Link href="/follow-up" style={{ color: "var(--color-primary-dark)", fontWeight: 700 }}>
+            متابعة الموعد
+          </Link>
+          ، وتقدر تتأخر أو تلغي عن طريق الاتصال بالعيادة.
+        </p>
       </div>
     );
   }

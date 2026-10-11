@@ -24,8 +24,9 @@ create table if not exists public.busy_slots (
 
 create table if not exists public.online_bookings (
   id uuid primary key default gen_random_uuid(),
-  -- بند (طلب الدكتور 2026-09-22): الاسم الثلاثي وتاريخ الميلاد إجباريين — المطابقة مع النظام الداخلي
-  -- بقت بالاسم الثلاثي (مش برقم الموبايل، لأن أكتر من مريض بيستخدموا نفس الرقم فعليًا).
+  -- بند (طلب الدكتور 2026-09-22، وعُدّل 2026-10-11): الاسم الثلاثي وتاريخ الميلاد إجباريين — المطابقة مع
+  -- النظام الداخلي بقت بالاسم الثلاثي والرقم مع بعض (الاتنين لازم يتطابقوا على ملف موجود، وإلا يترفض الحجز
+  -- ويتوضح للسكرتيرة يدويًا — راجع syncService.ts) بعد باگ التباس حقيقي حصل من المطابقة بالاسم بس.
   patient_full_name text not null check (array_length(regexp_split_to_array(trim(patient_full_name), '\s+'), 1) >= 3),
   patient_phone text not null,
   -- بند (طلب الدكتور 2026-09-22): عمر المريض لازم يكون سنة على الأقل (منع كتابة تاريخ اليوم أو تاريخ قريب غلط).
@@ -33,6 +34,10 @@ create table if not exists public.online_bookings (
   service_id uuid not null references public.services(id),
   scheduled_at timestamptz not null,
   status text not null default 'pending_sync' check (status in ('pending_sync', 'synced', 'failed')),
+  -- بند (2026-10-11): الموقع بيولّد الكود ده بنفسه وقت الحجز (نفس صيغة DN-XXXXXX بتاعة local-server)
+  -- عشان المريض يشوفه فورًا في شاشة التأكيد من غير ما يستنى المزامنة. local-server بيستعمل نفس الكود ده
+  -- بالظبط وقت المزامنة (مش بيولّد كود جديد) عشان الكود اللي المريض شافه يبقى هو نفسه المحفوظ فعليًا.
+  booking_code text,
   local_appointment_id uuid,
   local_booking_code text,
   sync_error text,
@@ -41,6 +46,11 @@ create table if not exists public.online_bookings (
 );
 
 create index if not exists online_bookings_status_idx on public.online_bookings (status);
+
+-- يمنع تكرار الكود (فرصة التصادم شبه مستحيلة أصلاً — 6 خانات من 32 حرف — بس خط دفاع إضافي مجاني).
+create unique index if not exists online_bookings_booking_code_idx
+  on public.online_bookings (booking_code)
+  where booking_code is not null;
 
 -- Unique جزئي — خط دفاع أخير على مستوى الداتابيز ضد إن حجزين يوصلوا لنفس المعاد بالظبط في نفس اللحظة.
 create unique index if not exists online_bookings_active_slot_idx
