@@ -11,7 +11,7 @@ import { testimonials } from "@/lib/testimonials";
 // استخدام تجاري مجاني، Unsplash License) معتّمة بتدرّج من لون خلفية الموقع نفسه عشان النص يفضل واضح 100%.
 const aboutSectionBackgroundStyle = {
   backgroundColor: "var(--color-bg-soft)",
-  backgroundImage: `linear-gradient(135deg, rgba(248,250,252,0.55) 0%, rgba(240,253,250,0.45) 100%), url("${asset("about-bg.jpg")}")`,
+  backgroundImage: `linear-gradient(135deg, rgba(248,250,252,0.82) 0%, rgba(240,253,250,0.75) 100%), url("${asset("about-bg.jpg")}")`,
   backgroundSize: "cover",
   backgroundPosition: "center",
 };
@@ -21,7 +21,7 @@ const aboutSectionBackgroundStyle = {
 // الالتقاط مظبوط عشان الابتسامة نفسها تبان بوضوح (مش الشعر أو الجبهة بس).
 const servicesSectionBackgroundStyle = {
   backgroundColor: "var(--color-bg)",
-  backgroundImage: `linear-gradient(135deg, rgba(255,255,255,0.55) 0%, rgba(240,253,250,0.45) 100%), url("${asset("services-bg.jpg")}")`,
+  backgroundImage: `linear-gradient(135deg, rgba(255,255,255,0.82) 0%, rgba(240,253,250,0.75) 100%), url("${asset("services-bg.jpg")}")`,
   backgroundSize: "cover",
   backgroundPosition: "center 40%",
 };
