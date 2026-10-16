@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { getSupabasePublic } from "@/lib/supabasePublic";
+import { formatClinicDateTime, loadClinicTimeOffset } from "@/lib/clinicHours";
 
 interface AppointmentStatusResult {
   scheduled_at: string;
@@ -61,8 +62,9 @@ function formatTimeRemaining(scheduledAt: string): string {
   return `باقي حوالي ${days} يوم`;
 }
 
+// المعاد بيتعرض بساعة العيادة نفسها (زي ما السكرتيرة شايفاه) — مش بساعة موبايل المريض.
 function formatDateTime(scheduledAt: string): string {
-  return new Date(scheduledAt).toLocaleString("ar-EG", {
+  return formatClinicDateTime(scheduledAt, {
     weekday: "long",
     day: "numeric",
     month: "long",
@@ -79,6 +81,10 @@ export function FollowUpLookup() {
   const [result, setResult] = useState<AppointmentStatusResult | null>(null);
   const [pendingBooking, setPendingBooking] = useState<OnlineBookingStatusResult | null>(null);
   const [searched, setSearched] = useState(false);
+
+  useEffect(() => {
+    void loadClinicTimeOffset();
+  }, []);
 
   async function handleSubmit(event: React.FormEvent) {
     event.preventDefault();

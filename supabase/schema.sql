@@ -199,3 +199,13 @@ alter table public.clinic_time_offset enable row level security;
 create policy "anon can read clinic time offset" on public.clinic_time_offset
   for select to anon
   using (true);
+
+-- بند (2026-10-12): الإزاحة "الحالية" لوحدها مكانتش كفاية — الموقع كان بيطبّقها على كل الأيام، فأي حجز قبل تغيير
+-- التوقيت الصيفي لمعاد بعده كان بيتسجل بفرق ساعة. جهاز العيادة بيبعت دلوقتي (syncService.ts) إزاحة كل يوم من
+-- الأيام الجاية بساعته هو، وساعات العمل، واسم المنطقة الزمنية وساعته الحالية (للتشخيص). آمنة تتشغّل أكتر من مرة.
+alter table public.clinic_time_offset add column if not exists day_offsets jsonb;
+alter table public.clinic_time_offset add column if not exists time_zone text;
+alter table public.clinic_time_offset add column if not exists open_hour int;
+alter table public.clinic_time_offset add column if not exists close_hour int;
+alter table public.clinic_time_offset add column if not exists slot_step_minutes int;
+alter table public.clinic_time_offset add column if not exists device_now timestamptz;

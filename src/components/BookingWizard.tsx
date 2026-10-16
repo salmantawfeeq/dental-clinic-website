@@ -4,15 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { getSupabasePublic } from "@/lib/supabasePublic";
 import { generateBookingCode } from "@/lib/bookingCode";
-import {
-  buildCairoISOString,
-  nowInCairo,
-  formatTime12h,
-  loadClinicTimeOffset,
-  CLINIC_OPEN_HOUR,
-  CLINIC_CLOSE_HOUR,
-  SLOT_STEP_MINUTES,
-} from "@/lib/clinicHours";
+import { buildCairoISOString, nowInCairo, formatTime12h, loadClinicTimeOffset, clinicHours, clinicToday } from "@/lib/clinicHours";
 
 interface Service {
   id: string;
@@ -31,13 +23,15 @@ interface Slot {
 // عمليًا لأن onChange بيمسح أي حرف مش رقم قبل حتى ما نوصل هنا، بس بنصلحها عشان الفحص يبقى دقيق فعلًا.
 const EGYPT_PHONE_PATTERN = /^01[0125]\d{8}$/;
 
+// الأيام بتتحسب بتقويم العيادة (بساعة جهازها) — مش بتقويم جهاز المريض، عشان مريض بيحجز من بلد تاني (أو
+// موبايله على منطقة زمنية غلط) يشوف نفس أيام العيادة بالظبط.
 function nextDays(count: number): { value: string; label: string }[] {
   const days: { value: string; label: string }[] = [];
-  const formatter = new Intl.DateTimeFormat("ar-EG", { weekday: "short", day: "numeric", month: "short" });
+  const formatter = new Intl.DateTimeFormat("ar-EG", { weekday: "short", day: "numeric", month: "short", timeZone: "UTC" });
+  const today = clinicToday();
   for (let i = 0; i < count; i++) {
-    const d = new Date();
-    d.setDate(d.getDate() + i);
-    const value = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+    const d = new Date(Date.UTC(today.year, today.month - 1, today.day + i, 12));
+    const value = `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, "0")}-${String(d.getUTCDate()).padStart(2, "0")}`;
     days.push({ value, label: formatter.format(d) });
   }
   return days;
@@ -65,12 +59,13 @@ async function fetchSlotsForDay(date: string, serviceId: string): Promise<Slot[]
 
   const now = nowInCairo();
   const slots: Slot[] = [];
-  const totalMinutesInDay = (CLINIC_CLOSE_HOUR - CLINIC_OPEN_HOUR) * 60;
+  const hours = clinicHours();
+  const totalMinutesInDay = (hours.close - hours.open) * 60;
 
   // بند: آخر معاد قابل للحجز لازم يكون ساعة قفل العيادة نفسها (11:00 م) — لو الشرط كان "<" بس، آخر معاد
   // فعلي كان بيقف عند آخر خانة قبلها بخطوة (10:40 لو الخطوة 20 دقيقة)، مش الساعة المعلنة فعليًا.
-  for (let offset = 0; offset <= totalMinutesInDay; offset += SLOT_STEP_MINUTES) {
-    const hour = CLINIC_OPEN_HOUR + Math.floor(offset / 60);
+  for (let offset = 0; offset <= totalMinutesInDay; offset += hours.step) {
+    const hour = hours.open + Math.floor(offset / 60);
     const minute = offset % 60;
     const scheduledAt = new Date(buildCairoISOString(year, month, day, hour, minute));
     if (scheduledAt < now) continue;
@@ -104,7 +99,9 @@ export function BookingWizard() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [confirmed, setConfirmed] = useState<{ time: string; date: string; bookingCode: string } | null>(null);
 
-  const days = useMemo(() => nextDays(14), []);
+  // بتتحسب من تاني بعد ما إزاحة توقيت العيادة توصل (clockLoaded) — قبلها بيتحسب بالقيمة الاحتياطية.
+  const [clockLoaded, setClockLoaded] = useState(false);
+  const days = useMemo(() => nextDays(14), [clockLoaded]);
   const selectedService = services.find((s) => s.id === serviceId) ?? null;
   const cardRef = useRef<HTMLDivElement>(null);
 
@@ -118,7 +115,7 @@ export function BookingWizard() {
   // بند: بنحمّل إزاحة توقيت جهاز العيادة أول ما الصفحة تفتح — راجع تعليق loadClinicTimeOffset في
   // clinicHours.ts للتفصيل الكامل (مرجع واحد بس للوقت الصحيح، من ساعة الجهاز نفسه).
   useEffect(() => {
-    void loadClinicTimeOffset();
+    void loadClinicTimeOffset().then(() => setClockLoaded(true));
   }, []);
 
   useEffect(() => {
@@ -188,14 +185,14 @@ export function BookingWizard() {
   }, [step]);
 
   useEffect(() => {
-    if (!serviceId || !date) return;
+    if (!serviceId || !date || !clockLoaded) return;
     setLoadingSlots(true);
     setScheduledAt(null);
     fetchSlotsForDay(date, serviceId)
       .then(setSlots)
       .catch(() => setSlots([]))
       .finally(() => setLoadingSlots(false));
-  }, [serviceId, date]);
+  }, [serviceId, date, clockLoaded]);
 
   async function handleSubmit() {
     setErrorMessage(null);
